@@ -25,16 +25,32 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "=== Environment Check ==="
           node --version
           npm --version
-          echo "Gmail user: $GMAIL_USER"
-          echo "Recipient: $EMAIL_RECIPIENT"
-          echo "Password set: $([ -n "$GMAIL_APP_PASSWORD" ] && echo yes || echo no)"
           echo "=== Starting Script ==="
           node 01-claudenews-main.js
+      
+      # 关键: 把历史缓存 commit 回仓库, 实现跨运行的持久化
+      - name: Commit history cache
+        if: always()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          if [ -d "cache" ]; then
+            git add cache/
+            
+            # 只在有变化时提交
+            if git diff --staged --quiet; then
+              echo "No cache changes to commit"
+            else
+              git commit -m "chore: update history cache [skip ci]"
+              git push
+              echo "✓ Cache updated"
+            fi
+          fi
 
 permissions:
   contents: write
