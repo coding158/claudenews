@@ -1,84 +1,463 @@
 #!/usr/bin/env node
 
 /**
- * Claude News Collector v4.0
- * 改进:
- * - 新增 Google News RSS (覆盖所有主流英文媒体)
- * - 新增 主流媒体官方 RSS (TechCrunch, The Verge, Ars Technica等)
- * - 新增 中文科技媒体 RSS (机器之心, 36氪, 少数派, 量子位, InfoQ)
- * - 新增 知乎话题 API (Claude/Anthropic)
- * - 新增 搜狗微信搜索 (微信公众号文章)
- * - 保持时间分组（今天/昨天/本周早些时候）
+ * ═════════════════════════════════════════════════════════════════
+ *   Claude News Collector v5.0
+ * ═════════════════════════════════════════════════════════════════
+ *
+ * 升级内容（vs v4）:
+ *   ✓ 用 fast-xml-parser 替换正则RSS解析（处理Atom/CDATA/命名空间）
+ *   ✓ 用 p-limit 控制并发（同域名最多2-3个并发）
+ *   ✓ 用 AbortController 替代废弃的timeout
+ *   ✓ 加重试机制（指数退避）
+ *   ✓ 改进的相似度去重（jaccard + 标准化）
+ *   ✓ 解析Google News重定向链接
+ *   ✓ 时区统一为Asia/Shanghai
+ *   ✓ 历史记录去重（持久化到 cache/history.json）
+ *   ✓ 增量更新（只展示新内容）
+ *   ✓ 7天自动清理历史
+ *
+ * 文件结构（单文件内分区清晰）:
+ *   ┌── §1  常量配置
+ *   ├── §2  工具层    (logger, time, text, fetch with retry)
+ *   ├── §3  解析层    (XML/RSS, Google News URL decoder)
+ *   ├── §4  缓存层    (history.json 读写)
+ *   ├── §5  采集层    (9个数据源)
+ *   ├── §6  处理层    (去重 / 过滤 / 排序 / 分组)
+ *   ├── §7  渲染层    (HTML / Markdown)
+ *   ├── §8  邮件层
+ *   └── §9  主流程
  */
 
-console.log('\n═══════════════════════════════════════════');
-console.log('  Claude News Collector v4.0');
-console.log('═══════════════════════════════════════════\n');
+'use strict';
+
+// ═════════════════════════════════════════════════════════════════
+// §1 常量配置
+// ═════════════════════════════════════════════════════════════════
 
 const fetch = require('node-fetch');
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 配置
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-const GMAIL_USER = process.env.GMAIL_USER;
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
-const EMAIL_RECIPIENT = process.env.EMAIL_RECIPIENT || GMAIL_USER;
-
-const DAYS_TO_KEEP = 7;
-const cutoffDate = Date.now() - DAYS_TO_KEEP * 24 * 60 * 60 * 1000;
-const todayDate = new Date().setHours(0, 0, 0, 0);
-
-console.log('【步骤1】环境检查...');
-console.log(`  GMAIL_USER: ${GMAIL_USER ? '✓' : '❌'}`);
-console.log(`  GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD ? '✓' : '❌'}`);
-console.log(`  时间窗口: 最近 ${DAYS_TO_KEEP} 天\n`);
-
-if (!GMAIL_USER || !GMAIL_APP_PASSWORD) {
-  console.error('❌ 缺少必要的环境变量');
-  process.exit(1);
+// 尝试加载可选依赖（fast-xml-parser 和 p-limit）
+let XMLParser, pLimit;
+try {
+  XMLParser = require('fast-xml-parser').XMLParser;
+} catch (e) {
+  console.warn('⚠️  fast-xml-parser 未安装，将使用降级RSS解析');
+}
+try {
+  pLimit = require('p-limit');
+  // p-limit v3 是 CommonJS，v4+是ESM。处理两种情况
+  if (pLimit && pLimit.default) pLimit = pLimit.default;
+} catch (e) {
+  console.warn('⚠️  p-limit 未安装，将使用简单并发');
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 通用 RSS 解析器 (不依赖 rss-parser 库)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const CONFIG = {
+  // 环境变量
+  gmail: {
+    user: process.env.GMAIL_USER,
+    appPassword: process.env.GMAIL_APP_PASSWORD,
+  },
+  recipient: process.env.EMAIL_RECIPIENT || process.env.GMAIL_USER,
+  
+  // 时间窗口（天）
+  daysToKeep: 7,
+  
+  // 历史记录天数（用于去重）
+  historyDays: 14,
+  
+  // 缓存文件路径
+  cacheDir: 'cache',
+  historyFile: 'cache/history.json',
+  
+  // 网络配置
+  defaultTimeout: 15000,
+  maxRetries: 2,
+  concurrency: 4,            // 同时并发请求数
+  
+  // 内容限制
+  maxNewsItems: 50,           // 邮件中最多展示
+  
+  // 时区
+  timezone: 'Asia/Shanghai',
+};
 
-async function fetchRSS(url, options = {}) {
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': options.userAgent || 'Mozilla/5.0 (compatible; ClaudeNewsBot/4.0)',
-      ...options.headers,
-    },
-    timeout: options.timeout || 15000,
+// ═════════════════════════════════════════════════════════════════
+// §2 工具层
+// ═════════════════════════════════════════════════════════════════
+
+// ─────────── §2.1 Logger ───────────
+const logger = {
+  section: (title) => console.log(`\n【${title}】`),
+  info: (msg, indent = 1) => console.log('  '.repeat(indent) + msg),
+  success: (msg, indent = 1) => console.log('  '.repeat(indent) + '✓ ' + msg),
+  warn: (msg, indent = 1) => console.log('  '.repeat(indent) + '⚠️  ' + msg),
+  error: (msg, indent = 1) => console.error('  '.repeat(indent) + '❌ ' + msg),
+  divider: (char = '─', len = 50) => console.log(char.repeat(len)),
+  banner: (title) => {
+    const line = '═'.repeat(45);
+    console.log('\n' + line);
+    console.log(`  ${title}`);
+    console.log(line + '\n');
+  },
+};
+
+// ─────────── §2.2 时间工具 (统一时区) ───────────
+const timeUtil = {
+  // 北京时间的"今天0点"对应的UTC时间戳
+  getTodayStart() {
+    const now = new Date();
+    // 转换到Asia/Shanghai
+    const cnTime = new Date(now.toLocaleString('en-US', { timeZone: CONFIG.timezone }));
+    cnTime.setHours(0, 0, 0, 0);
+    return cnTime.getTime();
+  },
+  
+  getCutoff(days) {
+    return Date.now() - days * 86400000;
+  },
+  
+  formatCN(date, opts = {}) {
+    const d = new Date(date);
+    return d.toLocaleString('zh-CN', { 
+      timeZone: CONFIG.timezone, 
+      ...opts 
+    });
+  },
+  
+  formatDate(date) {
+    return this.formatCN(date, { year: 'numeric', month: '2-digit', day: '2-digit' });
+  },
+  
+  formatDateTime(date) {
+    return this.formatCN(date, { 
+      month: '2-digit', day: '2-digit', 
+      hour: '2-digit', minute: '2-digit' 
+    });
+  },
+  
+  isoDate(date = new Date()) {
+    // 用Asia/Shanghai的日期作为ISO日期
+    return new Intl.DateTimeFormat('sv-SE', { 
+      timeZone: CONFIG.timezone 
+    }).format(date);
+  },
+};
+
+// ─────────── §2.3 文本工具 ───────────
+const textUtil = {
+  clean(text) {
+    if (!text) return '';
+    return String(text)
+      .replace(/<[^>]+>/g, '')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&apos;/g, "'")
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+      .replace(/&#(\d+);/g, (_, num) => String.fromCodePoint(parseInt(num, 10)))
+      .replace(/\s+/g, ' ')
+      .trim();
+  },
+  
+  escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  },
+  
+  // 文本标准化（用于相似度比较）
+  normalize(text) {
+    return String(text || '')
+      .toLowerCase()
+      .replace(/https?:\/\/\S+/g, '')   // 去URL
+      .replace(/[^\w\u4e00-\u9fff\s]/g, ' ')  // 保留中英文字符
+      .replace(/\s+/g, ' ')
+      .trim();
+  },
+  
+  // Jaccard相似度
+  similarity(a, b) {
+    const na = this.normalize(a);
+    const nb = this.normalize(b);
+    if (!na || !nb) return 0;
+    
+    // 取标准化后的字符二元组
+    const ngrams = (s, n = 3) => {
+      const set = new Set();
+      for (let i = 0; i <= s.length - n; i++) set.add(s.slice(i, i + n));
+      return set;
+    };
+    
+    const A = ngrams(na);
+    const B = ngrams(nb);
+    if (A.size === 0 || B.size === 0) return 0;
+    
+    let intersection = 0;
+    for (const x of A) if (B.has(x)) intersection++;
+    
+    return intersection / (A.size + B.size - intersection);
+  },
+  
+  // 内容指纹（用于历史去重）
+  fingerprint(item) {
+    const key = this.normalize(item.title).slice(0, 100);
+    return crypto.createHash('md5').update(key).digest('hex').slice(0, 12);
+  },
+  
+  // URL规范化（去query参数中的tracking标签）
+  cleanUrl(url) {
+    if (!url) return '';
+    try {
+      const u = new URL(url);
+      const trackingParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 
+                              'utm_content', 'ref', 'fbclid', 'gclid', 'mc_cid', 'mc_eid'];
+      trackingParams.forEach(p => u.searchParams.delete(p));
+      return u.toString();
+    } catch {
+      return url;
+    }
+  },
+  
+  isRelevant(text) {
+    if (!text) return false;
+    const lower = text.toLowerCase();
+    return lower.includes('claude') 
+        || lower.includes('anthropic') 
+        || text.includes('克劳德') 
+        || text.includes('安特罗匹克')
+        || text.includes('安托罗匹克');
+  },
+};
+
+// ─────────── §2.4 HTTP工具 (含retry和timeout) ───────────
+async function fetchWithRetry(url, options = {}) {
+  const { 
+    timeout = CONFIG.defaultTimeout, 
+    retries = CONFIG.maxRetries,
+    ...fetchOptions 
+  } = options;
+  
+  let lastError;
+  
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, {
+        ...fetchOptions,
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; ClaudeNewsBot/5.0)',
+          ...fetchOptions.headers,
+        },
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        // 4xx不重试，5xx重试
+        if (response.status >= 400 && response.status < 500) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      lastError = error;
+      
+      // 不重试4xx
+      if (error.message.startsWith('HTTP 4')) throw error;
+      
+      // 还有重试次数
+      if (attempt < retries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+        await new Promise(r => setTimeout(r, delay));
+      }
+    }
+  }
+  
+  throw lastError;
+}
+
+// ─────────── §2.5 并发控制 ───────────
+function makeLimit(n) {
+  if (pLimit) return pLimit(n);
+  
+  // p-limit 不可用时的降级实现
+  let active = 0;
+  const queue = [];
+  
+  const next = () => {
+    if (active >= n || queue.length === 0) return;
+    active++;
+    const { fn, resolve, reject } = queue.shift();
+    fn().then(resolve, reject).finally(() => {
+      active--;
+      next();
+    });
+  };
+  
+  return (fn) => new Promise((resolve, reject) => {
+    queue.push({ fn, resolve, reject });
+    next();
+  });
+}
+
+// ═════════════════════════════════════════════════════════════════
+// §3 解析层
+// ═════════════════════════════════════════════════════════════════
+
+// ─────────── §3.1 RSS/Atom 解析 ───────────
+function parseRSS(xml) {
+  if (XMLParser) {
+    return parseRSSWithLib(xml);
+  } else {
+    return parseRSSWithRegex(xml);
+  }
+}
+
+function parseRSSWithLib(xml) {
+  const parser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: '@_',
+    cdataPropName: '__cdata',
+    parseTagValue: true,
+    trimValues: true,
   });
   
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  let parsed;
+  try {
+    parsed = parser.parse(xml);
+  } catch (e) {
+    return [];
+  }
   
-  const xml = await response.text();
-  return parseRSS(xml);
-}
-
-function parseRSS(xml) {
   const items = [];
   
-  // 同时支持 RSS 2.0 (<item>) 和 Atom (<entry>)
+  // RSS 2.0: rss.channel.item
+  const rssItems = parsed?.rss?.channel?.item;
+  if (rssItems) {
+    const arr = Array.isArray(rssItems) ? rssItems : [rssItems];
+    arr.forEach(item => {
+      items.push(normalizeRSSItem(item));
+    });
+  }
+  
+  // Atom: feed.entry
+  const atomEntries = parsed?.feed?.entry;
+  if (atomEntries) {
+    const arr = Array.isArray(atomEntries) ? atomEntries : [atomEntries];
+    arr.forEach(entry => {
+      items.push(normalizeAtomEntry(entry));
+    });
+  }
+  
+  return items.filter(i => i.title);
+}
+
+function normalizeRSSItem(item) {
+  const getText = (field) => {
+    const v = item[field];
+    if (!v) return '';
+    if (typeof v === 'string') return v;
+    if (v.__cdata) return String(v.__cdata);
+    if (v['#text']) return String(v['#text']);
+    return String(v);
+  };
+  
+  const title = textUtil.clean(getText('title'));
+  let link = getText('link');
+  if (typeof item.link === 'object' && item.link['@_href']) {
+    link = item.link['@_href'];
+  }
+  const description = textUtil.clean(
+    getText('description') || getText('content:encoded') || ''
+  );
+  const pubDate = getText('pubDate') || getText('dc:date') || '';
+  
+  return {
+    title,
+    link,
+    description,
+    pubDate: pubDate ? new Date(pubDate) : new Date(),
+  };
+}
+
+function normalizeAtomEntry(entry) {
+  const getText = (field) => {
+    const v = entry[field];
+    if (!v) return '';
+    if (typeof v === 'string') return v;
+    if (v.__cdata) return String(v.__cdata);
+    if (v['#text']) return String(v['#text']);
+    return String(v);
+  };
+  
+  const title = textUtil.clean(getText('title'));
+  
+  // Atom link 通常是属性
+  let link = '';
+  if (entry.link) {
+    if (Array.isArray(entry.link)) {
+      const alt = entry.link.find(l => !l['@_rel'] || l['@_rel'] === 'alternate');
+      link = alt?.['@_href'] || entry.link[0]?.['@_href'] || '';
+    } else if (typeof entry.link === 'object') {
+      link = entry.link['@_href'] || '';
+    } else {
+      link = String(entry.link);
+    }
+  }
+  
+  const description = textUtil.clean(
+    getText('summary') || getText('content') || ''
+  );
+  const pubDate = getText('published') || getText('updated') || '';
+  
+  return {
+    title,
+    link,
+    description,
+    pubDate: pubDate ? new Date(pubDate) : new Date(),
+  };
+}
+
+// 降级方案：正则解析
+function parseRSSWithRegex(xml) {
+  const items = [];
   const itemPattern = /<(item|entry)\b[^>]*>([\s\S]*?)<\/\1>/g;
   let match;
   
   while ((match = itemPattern.exec(xml)) !== null) {
     const itemXml = match[2];
-    
     const title = extractTag(itemXml, 'title');
     const link = extractLink(itemXml);
-    const description = extractTag(itemXml, 'description') || extractTag(itemXml, 'summary') || extractTag(itemXml, 'content');
-    const pubDate = extractTag(itemXml, 'pubDate') || extractTag(itemXml, 'published') || extractTag(itemXml, 'updated');
+    const description = extractTag(itemXml, 'description') 
+                     || extractTag(itemXml, 'summary') 
+                     || extractTag(itemXml, 'content');
+    const pubDate = extractTag(itemXml, 'pubDate') 
+                 || extractTag(itemXml, 'published') 
+                 || extractTag(itemXml, 'updated');
     
     if (title) {
       items.push({
-        title: cleanText(title),
+        title: textUtil.clean(title),
         link: link,
-        description: cleanText(description || ''),
+        description: textUtil.clean(description || ''),
         pubDate: pubDate ? new Date(pubDate) : new Date(),
       });
     }
@@ -88,7 +467,6 @@ function parseRSS(xml) {
 }
 
 function extractTag(xml, tag) {
-  // 处理 CDATA 和普通文本
   const cdataPattern = new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`, 'i');
   const normalPattern = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');
   
@@ -102,64 +480,149 @@ function extractTag(xml, tag) {
 }
 
 function extractLink(xml) {
-  // RSS 2.0: <link>url</link>
   const rssLink = extractTag(xml, 'link');
   if (rssLink && rssLink.startsWith('http')) return rssLink;
   
-  // Atom: <link href="url" />
   const atomMatch = xml.match(/<link[^>]+href="([^"]+)"/i);
   if (atomMatch) return atomMatch[1];
   
   return '';
 }
 
-function cleanText(text) {
-  if (!text) return '';
-  return text
-    .replace(/<[^>]+>/g, '')          // 去除HTML标签
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-// 判断是否包含 Claude/Anthropic 关键词
-function isRelevant(text) {
-  if (!text) return false;
-  const lower = text.toLowerCase();
-  return lower.includes('claude') || lower.includes('anthropic') || 
-         text.includes('克劳德') || text.includes('安特罗匹克') || 
-         text.includes('安托罗匹克') || text.includes('Anthropic');
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 数据源1: Hacker News
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-async function fetchHackerNews() {
-  console.log('  📡 Hacker News...');
+// ─────────── §3.2 Google News URL 解析 ───────────
+function decodeGoogleNewsUrl(url) {
+  if (!url || !url.includes('news.google.com')) return url;
+  
   try {
-    const url = 'https://hn.algolia.com/api/v1/search_by_date?query=claude+anthropic&tags=story&numericFilters=created_at_i>' 
-                + Math.floor(cutoffDate / 1000);
+    const u = new URL(url);
+    // Google News 的真实URL在 url 参数里
+    const realUrl = u.searchParams.get('url');
+    if (realUrl) return realUrl;
     
-    const response = await fetch(url, { timeout: 15000 });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    // 或者base64编码的articles路径
+    // 暂时返回原URL，深度解码需要复杂逻辑
+    return url;
+  } catch {
+    return url;
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════
+// §4 缓存层 (历史记录持久化)
+// ═════════════════════════════════════════════════════════════════
+
+const cache = {
+  data: {
+    items: {},     // { fingerprint: { firstSeen, lastSeen, count } }
+    lastRun: null,
+  },
+  
+  // 读取历史
+  load() {
+    try {
+      if (!fs.existsSync(CONFIG.cacheDir)) {
+        fs.mkdirSync(CONFIG.cacheDir, { recursive: true });
+      }
+      
+      if (fs.existsSync(CONFIG.historyFile)) {
+        const content = fs.readFileSync(CONFIG.historyFile, 'utf-8');
+        this.data = JSON.parse(content);
+        logger.success(`已加载历史记录: ${Object.keys(this.data.items || {}).length} 条`);
+      } else {
+        logger.info('首次运行，未找到历史记录');
+        this.data = { items: {}, lastRun: null };
+      }
+    } catch (e) {
+      logger.warn(`历史记录加载失败: ${e.message}，使用空历史`);
+      this.data = { items: {}, lastRun: null };
+    }
+  },
+  
+  // 写入历史
+  save() {
+    try {
+      if (!fs.existsSync(CONFIG.cacheDir)) {
+        fs.mkdirSync(CONFIG.cacheDir, { recursive: true });
+      }
+      
+      this.data.lastRun = new Date().toISOString();
+      fs.writeFileSync(
+        CONFIG.historyFile, 
+        JSON.stringify(this.data, null, 2),
+        'utf-8'
+      );
+      logger.success(`历史记录已保存: ${Object.keys(this.data.items).length} 条`);
+    } catch (e) {
+      logger.warn(`历史记录保存失败: ${e.message}`);
+    }
+  },
+  
+  // 检查是否已存在
+  has(item) {
+    const fp = textUtil.fingerprint(item);
+    return !!this.data.items[fp];
+  },
+  
+  // 添加到历史
+  add(item) {
+    const fp = textUtil.fingerprint(item);
+    const now = Date.now();
     
+    if (this.data.items[fp]) {
+      this.data.items[fp].lastSeen = now;
+      this.data.items[fp].count = (this.data.items[fp].count || 1) + 1;
+    } else {
+      this.data.items[fp] = {
+        firstSeen: now,
+        lastSeen: now,
+        count: 1,
+        title: item.title.slice(0, 100),
+      };
+    }
+  },
+  
+  // 清理过期历史
+  prune() {
+    const cutoff = Date.now() - CONFIG.historyDays * 86400000;
+    let pruned = 0;
+    
+    for (const [fp, info] of Object.entries(this.data.items)) {
+      if ((info.lastSeen || info.firstSeen || 0) < cutoff) {
+        delete this.data.items[fp];
+        pruned++;
+      }
+    }
+    
+    if (pruned > 0) {
+      logger.info(`清理了 ${pruned} 条过期历史 (${CONFIG.historyDays}天前)`);
+    }
+  },
+};
+
+// ═════════════════════════════════════════════════════════════════
+// §5 采集层
+// ═════════════════════════════════════════════════════════════════
+
+const cutoffDate = timeUtil.getCutoff(CONFIG.daysToKeep);
+
+// ─────────── §5.1 Hacker News ───────────
+async function fetchHackerNews() {
+  logger.info('📡 Hacker News...');
+  try {
+    const url = 'https://hn.algolia.com/api/v1/search_by_date?query=claude+anthropic&tags=story&numericFilters=created_at_i>'
+              + Math.floor(cutoffDate / 1000);
+    
+    const response = await fetchWithRetry(url);
     const data = await response.json();
     const hits = data.hits || [];
     
     const news = [];
     hits.forEach(hit => {
-      if (!hit.title || !isRelevant(hit.title)) return;
-      
+      if (!hit.title || !textUtil.isRelevant(hit.title)) return;
       news.push({
         title: String(hit.title),
         description: String(hit.title),
-        link: hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
+        link: textUtil.cleanUrl(hit.url || `https://news.ycombinator.com/item?id=${hit.objectID}`),
         source: 'Hacker News',
         publishedAt: new Date(hit.created_at),
         points: hit.points || 0,
@@ -167,31 +630,25 @@ async function fetchHackerNews() {
       });
     });
     
-    console.log(`      ✓ ${news.length} 条`);
+    logger.success(`${news.length} 条`, 2);
     return news;
   } catch (error) {
-    console.log(`      ⚠️  ${error.message}`);
+    logger.warn(error.message, 2);
     return [];
   }
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 数据源2: Reddit
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+// ─────────── §5.2 Reddit ───────────
 async function fetchReddit() {
-  console.log('  🔴 Reddit...');
+  logger.info('🔴 Reddit...');
   const news = [];
   
   for (const sub of ['ClaudeAI', 'Anthropic']) {
     try {
       const url = `https://old.reddit.com/r/${sub}/top.json?t=week&limit=15`;
-      const response = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0 ClaudeNewsBot/4.0' },
-        timeout: 15000,
+      const response = await fetchWithRetry(url, {
+        headers: { 'User-Agent': 'Mozilla/5.0 ClaudeNewsBot/5.0' },
       });
-      
-      if (!response.ok) continue;
       
       const data = await response.json();
       const posts = data?.data?.children || [];
@@ -206,68 +663,59 @@ async function fetchReddit() {
         news.push({
           title: String(p.title),
           description: String(p.selftext || p.title).substring(0, 300),
-          link: `https://reddit.com${p.permalink}`,
+          link: textUtil.cleanUrl(`https://reddit.com${p.permalink}`),
           source: `Reddit r/${sub}`,
           publishedAt: postDate,
           points: p.score || 0,
           commentsCount: p.num_comments || 0,
         });
       });
-    } catch (e) { /* 忽略 */ }
+    } catch (e) { /* 忽略单个失败 */ }
   }
   
-  console.log(`      ✓ ${news.length} 条`);
+  logger.success(`${news.length} 条`, 2);
   return news;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 数据源3: GitHub
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+// ─────────── §5.3 GitHub ───────────
 async function fetchGitHub() {
-  console.log('  🐙 GitHub...');
+  logger.info('🐙 GitHub...');
   try {
-    const since = new Date(cutoffDate).toISOString().split('T')[0];
+    const since = timeUtil.isoDate(new Date(cutoffDate));
     const url = `https://api.github.com/search/repositories?q=claude+anthropic+pushed:>${since}&sort=stars&order=desc&per_page=10`;
     
-    const response = await fetch(url, {
-      headers: { 'User-Agent': 'ClaudeNewsBot/4.0', 'Accept': 'application/vnd.github.v3+json' },
-      timeout: 15000,
+    const response = await fetchWithRetry(url, {
+      headers: { 
+        'User-Agent': 'ClaudeNewsBot/5.0',
+        'Accept': 'application/vnd.github.v3+json' 
+      },
     });
-    
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     
     const data = await response.json();
     const news = (data.items || []).map(item => ({
       title: `[${item.full_name}] ${(item.description || '').substring(0, 100)}`,
       description: item.description || '',
-      link: item.html_url,
+      link: textUtil.cleanUrl(item.html_url),
       source: 'GitHub',
       publishedAt: new Date(item.pushed_at || item.updated_at),
       points: item.stargazers_count || 0,
     }));
     
-    console.log(`      ✓ ${news.length} 条`);
+    logger.success(`${news.length} 条`, 2);
     return news;
   } catch (error) {
-    console.log(`      ⚠️  ${error.message}`);
+    logger.warn(error.message, 2);
     return [];
   }
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 数据源4: Anthropic 官方
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+// ─────────── §5.4 Anthropic 官方 ───────────
 async function fetchAnthropicNews() {
-  console.log('  📰 Anthropic Official...');
+  logger.info('📰 Anthropic Official...');
   try {
-    const response = await fetch('https://www.anthropic.com/news', {
+    const response = await fetchWithRetry('https://www.anthropic.com/news', {
       headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
-      timeout: 15000,
     });
-    
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     
     const html = await response.text();
     const linkPattern = /href="(\/news\/[^"]+)"[^>]*>([^<]+)</g;
@@ -276,16 +724,16 @@ async function fetchAnthropicNews() {
     let match;
     
     while ((match = linkPattern.exec(html)) !== null) {
-      const [, path, title] = match;
+      const [, urlPath, title] = match;
       const cleanTitle = title.trim();
       if (!cleanTitle || cleanTitle.length < 5 || cleanTitle.length > 200) continue;
-      if (seen.has(path)) continue;
-      seen.add(path);
+      if (seen.has(urlPath)) continue;
+      seen.add(urlPath);
       
       news.push({
         title: cleanTitle,
         description: cleanTitle,
-        link: `https://www.anthropic.com${path}`,
+        link: `https://www.anthropic.com${urlPath}`,
         source: 'Anthropic Official',
         publishedAt: new Date(),
         isOfficial: true,
@@ -293,37 +741,38 @@ async function fetchAnthropicNews() {
     }
     
     const result = news.slice(0, 8);
-    console.log(`      ✓ ${result.length} 条`);
+    logger.success(`${result.length} 条`, 2);
     return result;
   } catch (error) {
-    console.log(`      ⚠️  ${error.message}`);
+    logger.warn(error.message, 2);
     return [];
   }
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 数据源5: Google News (聚合所有西方主流媒体)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+// ─────────── §5.5 Google News (聚合西方主流) ───────────
 async function fetchGoogleNews() {
-  console.log('  🌍 Google News (西方主流媒体)...');
+  logger.info('🌍 Google News...');
   const news = [];
   
   const queries = [
-    { q: 'Anthropic Claude', lang: 'en-US', region: 'US' },
-    { q: 'Claude AI Anthropic', lang: 'en-US', region: 'US' },
+    'Anthropic Claude',
+    'Claude AI Anthropic',
   ];
   
-  for (const { q, lang, region } of queries) {
+  const limit = makeLimit(2);
+  
+  await Promise.allSettled(queries.map(q => limit(async () => {
     try {
-      const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}+when:7d&hl=${lang}&gl=${region}&ceid=${region}:${lang.split('-')[0]}`;
-      const items = await fetchRSS(url);
+      const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}+when:7d&hl=en-US&gl=US&ceid=US:en`;
+      const response = await fetchWithRetry(url);
+      const xml = await response.text();
+      const items = parseRSS(xml);
       
       items.forEach(item => {
-        if (!isRelevant(item.title)) return;
+        if (!textUtil.isRelevant(item.title)) return;
         if (item.pubDate.getTime() < cutoffDate) return;
         
-        // Google News 的链接是重定向链接，提取真实来源
+        // 标题中提取来源: "标题 - The New York Times"
         const sourceMatch = item.title.match(/ - ([^-]+)$/);
         const realSource = sourceMatch ? sourceMatch[1].trim() : 'Google News';
         const cleanTitle = item.title.replace(/ - [^-]+$/, '').trim();
@@ -331,37 +780,31 @@ async function fetchGoogleNews() {
         news.push({
           title: cleanTitle,
           description: item.description.substring(0, 300),
-          link: item.link,
-          source: `${realSource}`,
+          link: decodeGoogleNewsUrl(item.link),
+          source: realSource,
           publishedAt: item.pubDate,
           category: 'western_media',
         });
       });
-    } catch (e) {
-      console.log(`      ⚠️  Google News (${q}): ${e.message}`);
-    }
-  }
+    } catch (e) { /* 忽略 */ }
+  })));
   
-  // 去重
+  // 同名去重
   const seen = new Set();
   const deduped = news.filter(item => {
-    const key = item.title.toLowerCase().substring(0, 60);
+    const key = textUtil.normalize(item.title).slice(0, 60);
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
   
-  console.log(`      ✓ ${deduped.length} 条 (来自纽约时报/WSJ/TechCrunch等)`);
+  logger.success(`${deduped.length} 条 (含NYT/WSJ/TechCrunch等)`, 2);
   return deduped;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 数据源6: 西方主流媒体官方 RSS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+// ─────────── §5.6 西方媒体 RSS ───────────
 async function fetchWesternMediaRSS() {
-  console.log('  🌐 西方媒体官方 RSS...');
-  const news = [];
+  logger.info('🌐 西方媒体 RSS...');
   
   const feeds = [
     { url: 'https://techcrunch.com/feed/', source: 'TechCrunch' },
@@ -372,36 +815,39 @@ async function fetchWesternMediaRSS() {
     { url: 'https://venturebeat.com/feed/', source: 'VentureBeat' },
   ];
   
-  await Promise.allSettled(feeds.map(async ({ url, source }) => {
+  const news = [];
+  const limit = makeLimit(CONFIG.concurrency);
+  
+  await Promise.allSettled(feeds.map(({ url, source }) => limit(async () => {
     try {
-      const items = await fetchRSS(url, { timeout: 12000 });
+      const response = await fetchWithRetry(url, { timeout: 12000 });
+      const xml = await response.text();
+      const items = parseRSS(xml);
+      
       items.forEach(item => {
-        if (!isRelevant(item.title) && !isRelevant(item.description)) return;
+        const text = `${item.title} ${item.description}`;
+        if (!textUtil.isRelevant(text)) return;
         if (item.pubDate.getTime() < cutoffDate) return;
         
         news.push({
           title: item.title,
           description: item.description.substring(0, 300),
-          link: item.link,
+          link: textUtil.cleanUrl(item.link),
           source: source,
           publishedAt: item.pubDate,
           category: 'western_media',
         });
       });
-    } catch (e) { /* 忽略单个源失败 */ }
-  }));
+    } catch (e) { /* 忽略 */ }
+  })));
   
-  console.log(`      ✓ ${news.length} 条`);
+  logger.success(`${news.length} 条`, 2);
   return news;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 数据源7: 中文科技媒体 RSS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+// ─────────── §5.7 中文科技媒体 RSS ───────────
 async function fetchChineseMediaRSS() {
-  console.log('  🇨🇳 中文科技媒体 RSS...');
-  const news = [];
+  logger.info('🇨🇳 中文科技媒体 RSS...');
   
   const feeds = [
     { url: 'https://sspai.com/feed', source: '少数派' },
@@ -409,247 +855,247 @@ async function fetchChineseMediaRSS() {
     { url: 'https://www.jiqizhixin.com/rss', source: '机器之心' },
     { url: 'https://www.qbitai.com/feed', source: '量子位' },
     { url: 'https://www.infoq.cn/feed.xml', source: 'InfoQ中文' },
-    { url: 'https://rsshub.app/aifeng/news', source: 'AI风向标' },  // 备选
   ];
   
-  await Promise.allSettled(feeds.map(async ({ url, source }) => {
+  const news = [];
+  const limit = makeLimit(CONFIG.concurrency);
+  
+  await Promise.allSettled(feeds.map(({ url, source }) => limit(async () => {
     try {
-      const items = await fetchRSS(url, { timeout: 12000 });
+      const response = await fetchWithRetry(url, { timeout: 12000 });
+      const xml = await response.text();
+      const items = parseRSS(xml);
+      
       items.forEach(item => {
-        if (!isRelevant(item.title) && !isRelevant(item.description)) return;
+        const text = `${item.title} ${item.description}`;
+        if (!textUtil.isRelevant(text)) return;
         if (item.pubDate.getTime() < cutoffDate) return;
         
         news.push({
           title: item.title,
           description: item.description.substring(0, 300),
-          link: item.link,
+          link: textUtil.cleanUrl(item.link),
           source: source,
           publishedAt: item.pubDate,
           category: 'chinese_media',
         });
       });
-    } catch (e) { /* 忽略单个源失败 */ }
-  }));
+    } catch (e) { /* 忽略 */ }
+  })));
   
-  console.log(`      ✓ ${news.length} 条`);
+  logger.success(`${news.length} 条`, 2);
   return news;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 数据源8: 知乎话题
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+// ─────────── §5.8 知乎 ───────────
 async function fetchZhihu() {
-  console.log('  💭 知乎...');
+  logger.info('💭 知乎...');
   const news = [];
   
-  try {
-    // 知乎搜索API
-    const queries = ['Claude', 'Anthropic'];
-    
-    for (const q of queries) {
-      try {
-        const url = `https://www.zhihu.com/api/v4/search_v3?t=general&q=${encodeURIComponent(q)}&correction=1&offset=0&limit=10&filter_fields=&lc_idx=0&show_all_topics=0&search_source=Filter&time_interval=a_week`;
+  for (const q of ['Claude', 'Anthropic']) {
+    try {
+      const url = `https://www.zhihu.com/api/v4/search_v3?t=general&q=${encodeURIComponent(q)}&correction=1&offset=0&limit=10&time_interval=a_week`;
+      const response = await fetchWithRetry(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0',
+          'Accept': 'application/json',
+          'Referer': 'https://www.zhihu.com/',
+        },
+      });
+      
+      const data = await response.json();
+      const items = data.data || [];
+      
+      items.forEach(item => {
+        const obj = item.object;
+        if (!obj || !obj.title) return;
         
-        const response = await fetch(url, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0',
-            'Accept': 'application/json',
-            'Referer': 'https://www.zhihu.com/',
-          },
-          timeout: 15000,
+        const title = textUtil.clean(obj.title);
+        if (!textUtil.isRelevant(title) && !textUtil.isRelevant(obj.excerpt || '')) return;
+        
+        const created = obj.created_time || obj.updated_time;
+        if (created && created * 1000 < cutoffDate) return;
+        
+        let link = '';
+        if (obj.type === 'answer') {
+          link = `https://www.zhihu.com/question/${obj.question?.id}/answer/${obj.id}`;
+        } else if (obj.type === 'article') {
+          link = `https://zhuanlan.zhihu.com/p/${obj.id}`;
+        } else if (obj.type === 'question') {
+          link = `https://www.zhihu.com/question/${obj.id}`;
+        }
+        
+        if (!link) return;
+        
+        news.push({
+          title: title,
+          description: textUtil.clean(obj.excerpt || '').substring(0, 300),
+          link: textUtil.cleanUrl(link),
+          source: `知乎 (${obj.type === 'answer' ? '回答' : obj.type === 'article' ? '文章' : '问题'})`,
+          publishedAt: created ? new Date(created * 1000) : new Date(),
+          points: obj.voteup_count || 0,
+          commentsCount: obj.comment_count || 0,
+          category: 'chinese_media',
         });
-        
-        if (!response.ok) continue;
-        
-        const data = await response.json();
-        const items = data.data || [];
-        
-        items.forEach(item => {
-          const obj = item.object;
-          if (!obj || !obj.title) return;
-          
-          const title = cleanText(obj.title);
-          if (!isRelevant(title) && !isRelevant(obj.excerpt || '')) return;
-          
-          const created = obj.created_time || obj.updated_time;
-          if (created && created * 1000 < cutoffDate) return;
-          
-          let link = '';
-          if (obj.type === 'answer') {
-            link = `https://www.zhihu.com/question/${obj.question?.id}/answer/${obj.id}`;
-          } else if (obj.type === 'article') {
-            link = `https://zhuanlan.zhihu.com/p/${obj.id}`;
-          } else if (obj.type === 'question') {
-            link = `https://www.zhihu.com/question/${obj.id}`;
-          }
-          
-          news.push({
-            title: title,
-            description: cleanText(obj.excerpt || '').substring(0, 300),
-            link: link || `https://www.zhihu.com/search?q=${encodeURIComponent(title)}`,
-            source: `知乎 (${obj.type === 'answer' ? '回答' : obj.type === 'article' ? '文章' : '问题'})`,
-            publishedAt: created ? new Date(created * 1000) : new Date(),
-            points: obj.voteup_count || 0,
-            commentsCount: obj.comment_count || 0,
-            category: 'chinese_media',
-          });
-        });
-      } catch (e) { /* 忽略 */ }
-    }
-    
-    console.log(`      ✓ ${news.length} 条`);
-  } catch (error) {
-    console.log(`      ⚠️  ${error.message}`);
+      });
+    } catch (e) { /* 忽略 */ }
   }
   
+  logger.success(`${news.length} 条`, 2);
   return news;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 数据源9: 搜狗微信搜索
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+// ─────────── §5.9 搜狗微信 ───────────
 async function fetchWeixin() {
-  console.log('  💬 搜狗微信...');
+  logger.info('💬 搜狗微信...');
   const news = [];
   
-  try {
-    const queries = ['Anthropic Claude', 'Claude AI'];
-    
-    for (const q of queries) {
-      try {
-        // 搜狗微信搜索 (按时间排序)
-        const url = `https://weixin.sogou.com/weixin?type=2&query=${encodeURIComponent(q)}&tsn=1&ie=utf8`;
+  for (const q of ['Anthropic Claude', 'Claude AI']) {
+    try {
+      const url = `https://weixin.sogou.com/weixin?type=2&query=${encodeURIComponent(q)}&tsn=1&ie=utf8`;
+      const response = await fetchWithRetry(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0',
+          'Accept': 'text/html,application/xhtml+xml',
+          'Accept-Language': 'zh-CN,zh;q=0.9',
+        },
+        retries: 0,  // 搜狗反爬不重试
+      });
+      
+      const html = await response.text();
+      const articlePattern = /<h3[^>]*>\s*<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/h3>/g;
+      
+      let match;
+      let count = 0;
+      while ((match = articlePattern.exec(html)) !== null && count < 10) {
+        const link = match[1].startsWith('http') ? match[1] : `https://weixin.sogou.com${match[1]}`;
+        const title = textUtil.clean(match[2]);
         
-        const response = await fetch(url, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0',
-            'Accept': 'text/html,application/xhtml+xml',
-            'Accept-Language': 'zh-CN,zh;q=0.9',
-          },
-          timeout: 15000,
+        if (!title || !textUtil.isRelevant(title)) continue;
+        
+        news.push({
+          title: title,
+          description: title,
+          link: link,
+          source: '微信公众号 (搜狗)',
+          publishedAt: new Date(),
+          category: 'chinese_media',
         });
-        
-        if (!response.ok) {
-          console.log(`      ⚠️  搜狗微信(${q}): HTTP ${response.status}`);
-          continue;
-        }
-        
-        const html = await response.text();
-        
-        // 提取微信文章 (搜狗的HTML结构)
-        // <h3><a ... href="..." ...>标题</a></h3>
-        const articlePattern = /<h3[^>]*>\s*<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>\s*<\/h3>/g;
-        const datePattern = /<span[^>]*class="s2"[^>]*>([^<]+)</g;
-        const authorPattern = /<a[^>]+id="account_name_\d+"[^>]*>([^<]+)</g;
-        
-        let match;
-        let count = 0;
-        const articles = [];
-        
-        while ((match = articlePattern.exec(html)) !== null && count < 10) {
-          const link = match[1].startsWith('http') ? match[1] : `https://weixin.sogou.com${match[1]}`;
-          const title = cleanText(match[2]);
-          
-          if (!title || !isRelevant(title)) continue;
-          
-          articles.push({ link, title });
-          count++;
-        }
-        
-        articles.forEach(art => {
-          news.push({
-            title: art.title,
-            description: art.title,
-            link: art.link,
-            source: '微信公众号 (搜狗)',
-            publishedAt: new Date(),  // 搜狗的时间不太准，用当前时间
-            category: 'chinese_media',
-          });
-        });
-      } catch (e) {
-        console.log(`      ⚠️  搜狗微信(${q}): ${e.message}`);
+        count++;
       }
-    }
-    
-    console.log(`      ✓ ${news.length} 条 (微信反爬严格，结果可能为0)`);
-  } catch (error) {
-    console.log(`      ⚠️  ${error.message}`);
+    } catch (e) { /* 忽略，搜狗经常失败 */ }
   }
   
+  logger.success(`${news.length} 条 (搜狗反爬严格)`, 2);
   return news;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 过滤和去重
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ═════════════════════════════════════════════════════════════════
+// §6 处理层
+// ═════════════════════════════════════════════════════════════════
 
-function filterAndDedupe(items) {
-  console.log('\n【步骤3】过滤和去重...');
-  console.log(`  原始数据: ${items.length} 条`);
+function processNews(rawItems) {
+  logger.section('步骤3: 处理数据');
   
-  let filtered = items.filter(item => item && item.title && item.title.length > 5);
-  console.log(`  有效数据: ${filtered.length} 条`);
+  // ─── §6.1 清洗 ───
+  let items = rawItems.filter(i => i && i.title && i.title.length >= 5);
+  logger.info(`原始 → 清洗后: ${rawItems.length} → ${items.length}`);
   
-  filtered = filtered.filter(item => {
+  // ─── §6.2 时间过滤 ───
+  items = items.filter(item => {
     if (item.isOfficial) return true;
     return new Date(item.publishedAt).getTime() >= cutoffDate;
   });
-  console.log(`  时间过滤后: ${filtered.length} 条`);
+  logger.info(`时间过滤: ${items.length} (最近${CONFIG.daysToKeep}天)`);
   
-  const seen = new Set();
-  filtered = filtered.filter(item => {
-    const key = item.title.toLowerCase().substring(0, 60).replace(/\s+/g, ' ').trim();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
+  // ─── §6.3 智能去重 (相似度) ───
+  items = dedupeBySimilarity(items, 0.75);
+  logger.info(`相似度去重: ${items.length}`);
+  
+  // ─── §6.4 历史去重 ───
+  const fresh = [];
+  const seen = [];
+  
+  items.forEach(item => {
+    if (cache.has(item)) {
+      seen.push(item);
+    } else {
+      fresh.push(item);
+    }
+    cache.add(item);   // 不管新旧都记录到历史
   });
-  console.log(`  去重后: ${filtered.length} 条`);
   
-  filtered.sort((a, b) => {
+  logger.info(`历史去重: ${items.length} → ${fresh.length} 新 + ${seen.length} 重复`);
+  
+  // 如果新内容太少（<5条），保留少量历史中的优质内容
+  let result = fresh;
+  if (fresh.length < 5 && seen.length > 0) {
+    const topSeen = seen
+      .filter(i => (i.points || 0) >= 10 || i.isOfficial)
+      .slice(0, 5 - fresh.length);
+    result = [...fresh, ...topSeen];
+    logger.info(`新内容不足，补充 ${topSeen.length} 条优质历史`);
+  }
+  
+  // ─── §6.5 排序 ───
+  result.sort((a, b) => {
     if (a.isOfficial && !b.isOfficial) return -1;
     if (!a.isOfficial && b.isOfficial) return 1;
     return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
   });
   
-  filtered = filtered.slice(0, 50);  // V4 允许更多条目
-  console.log(`  最终保留: ${filtered.length} 条\n`);
+  // ─── §6.6 限制总数 ───
+  if (result.length > CONFIG.maxNewsItems) {
+    result = result.slice(0, CONFIG.maxNewsItems);
+    logger.info(`限制总数: ${CONFIG.maxNewsItems}`);
+  }
   
-  return filtered;
+  logger.success(`最终保留: ${result.length} 条`);
+  return result;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 时间分组
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function dedupeBySimilarity(items, threshold) {
+  const result = [];
+  
+  for (const item of items) {
+    let isDuplicate = false;
+    for (const existing of result) {
+      if (textUtil.similarity(item.title, existing.title) >= threshold) {
+        isDuplicate = true;
+        // 多源同新闻：合并热度
+        existing.points = (existing.points || 0) + (item.points || 0);
+        break;
+      }
+    }
+    if (!isDuplicate) result.push(item);
+  }
+  
+  return result;
+}
 
 function groupByTime(news) {
   const groups = { today: [], yesterday: [], thisWeek: [], official: [] };
-  const yesterday = todayDate - 24 * 60 * 60 * 1000;
+  const todayStart = timeUtil.getTodayStart();
+  const yesterdayStart = todayStart - 86400000;
   
   news.forEach(item => {
-    if (item.isOfficial) { groups.official.push(item); return; }
+    if (item.isOfficial) {
+      groups.official.push(item);
+      return;
+    }
     const t = new Date(item.publishedAt).getTime();
-    if (t >= todayDate) groups.today.push(item);
-    else if (t >= yesterday) groups.yesterday.push(item);
+    if (t >= todayStart) groups.today.push(item);
+    else if (t >= yesterdayStart) groups.yesterday.push(item);
     else groups.thisWeek.push(item);
   });
   
   return groups;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 生成邮件 (保持时间分组)
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ═════════════════════════════════════════════════════════════════
+// §7 渲染层
+// ═════════════════════════════════════════════════════════════════
 
-function escapeHtml(text) {
-  if (text === null || text === undefined) return '';
-  return String(text)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-}
-
-// 给来源加上图标方便区分
 function getSourceIcon(source, category) {
   if (source === 'Anthropic Official') return '🌟';
   if (source === 'Hacker News') return '🟠';
@@ -660,64 +1106,76 @@ function getSourceIcon(source, category) {
   return '📰';
 }
 
-function renderItem(item, idx) {
-  const timeStr = new Date(item.publishedAt).toLocaleString('zh-CN', { 
-    month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' 
-  });
-  
+function getBorderColor(item) {
+  if (item.isOfficial) return '#f59e0b';
+  if (item.category === 'chinese_media') return '#ef4444';
+  if (item.category === 'western_media') return '#3b82f6';
+  return '#667eea';
+}
+
+// ─────────── §7.1 HTML 渲染 ───────────
+function renderItemHTML(item, idx) {
+  const timeStr = timeUtil.formatDateTime(item.publishedAt);
   const icon = getSourceIcon(item.source, item.category);
-  const borderColor = item.isOfficial ? '#f59e0b' 
-                    : item.category === 'chinese_media' ? '#ef4444'
-                    : item.category === 'western_media' ? '#3b82f6'
-                    : '#667eea';
+  const borderColor = getBorderColor(item);
   
   return `
     <div style="border-left: 4px solid ${borderColor}; padding: 12px 15px; margin: 12px 0; background: #f9fafb; border-radius: 4px;">
       <h3 style="margin: 0 0 6px 0; color: #222; font-size: 14px; line-height: 1.4;">
-        ${idx}. ${escapeHtml(item.title)}
+        ${idx}. ${textUtil.escapeHtml(item.title)}
       </h3>
       <p style="margin: 4px 0; color: #666; font-size: 11px;">
-        ${icon} <strong>${escapeHtml(item.source)}</strong> · ${timeStr}
+        ${icon} <strong>${textUtil.escapeHtml(item.source)}</strong> · ${timeStr}
         ${item.points ? ` · 👍 ${item.points}` : ''}
         ${item.commentsCount ? ` · 💬 ${item.commentsCount}` : ''}
       </p>
       ${item.description && item.description !== item.title ? 
-        `<p style="margin: 6px 0; color: #555; font-size: 12px; line-height: 1.5;">${escapeHtml(String(item.description).substring(0, 180))}${item.description.length > 180 ? '...' : ''}</p>` : ''}
-      ${item.link ? `<a href="${escapeHtml(item.link)}" style="color: ${borderColor}; text-decoration: none; font-size: 12px;">→ 查看详情</a>` : ''}
+        `<p style="margin: 6px 0; color: #555; font-size: 12px; line-height: 1.5;">${textUtil.escapeHtml(String(item.description).substring(0, 180))}${item.description.length > 180 ? '...' : ''}</p>` : ''}
+      ${item.link ? `<a href="${textUtil.escapeHtml(item.link)}" style="color: ${borderColor}; text-decoration: none; font-size: 12px;">→ 查看详情</a>` : ''}
     </div>`;
 }
 
-function generateHTML(news, groups) {
-  const date = new Date();
-  const dateStr = date.toLocaleDateString('zh-CN');
+function renderHTML(news, groups) {
+  const dateStr = timeUtil.formatDate(new Date());
   
-  let sectionsHTML = '';
-  let idx = 1;
-  
-  const renderSection = (title, color, items) => {
-    if (items.length === 0) return '';
-    let s = `<h2 style="color: ${color}; font-size: 16px; margin: 20px 0 10px 0; border-bottom: 2px solid ${color}; padding-bottom: 5px;">${title} <span style="font-size: 12px; color: #999;">(${items.length})</span></h2>`;
-    items.forEach(item => s += renderItem(item, idx++));
-    return s;
+  const renderSection = (title, color, items, idxStart) => {
+    if (items.length === 0) return { html: '', nextIdx: idxStart };
+    let html = `<h2 style="color: ${color}; font-size: 16px; margin: 20px 0 10px 0; border-bottom: 2px solid ${color}; padding-bottom: 5px;">${title} <span style="font-size: 12px; color: #999;">(${items.length})</span></h2>`;
+    let idx = idxStart;
+    items.forEach(item => {
+      html += renderItemHTML(item, idx++);
+    });
+    return { html, nextIdx: idx };
   };
   
-  sectionsHTML += renderSection('🌟 Anthropic 官方', '#f59e0b', groups.official);
-  sectionsHTML += renderSection('📅 今天', '#10b981', groups.today);
-  sectionsHTML += renderSection('📆 昨天', '#3b82f6', groups.yesterday);
-  sectionsHTML += renderSection('📋 本周早些时候', '#6b7280', groups.thisWeek);
+  let allHTML = '';
+  let idx = 1;
   
-  if (news.length === 0) {
-    sectionsHTML = '<p style="color: #999; padding: 20px; text-align: center;">今日暂无 Claude / Anthropic 相关动态</p>';
+  const sections = [
+    { title: '🌟 Anthropic 官方', color: '#f59e0b', items: groups.official },
+    { title: '📅 今天', color: '#10b981', items: groups.today },
+    { title: '📆 昨天', color: '#3b82f6', items: groups.yesterday },
+    { title: '📋 本周早些时候', color: '#6b7280', items: groups.thisWeek },
+  ];
+  
+  for (const sec of sections) {
+    const { html, nextIdx } = renderSection(sec.title, sec.color, sec.items, idx);
+    allHTML += html;
+    idx = nextIdx;
   }
   
-  // 统计来源
+  if (news.length === 0) {
+    allHTML = '<p style="color: #999; padding: 20px; text-align: center;">今日暂无 Claude / Anthropic 相关新增动态</p>';
+  }
+  
+  // 来源统计
   const sourceStats = {};
   news.forEach(item => {
     const key = item.category === 'western_media' ? '🌍 西方媒体'
               : item.category === 'chinese_media' ? '🇨🇳 中文媒体'
-              : item.isOfficial ? '🌟 Anthropic官方'
+              : item.isOfficial ? '🌟 官方'
               : item.source.includes('Reddit') ? '🔴 Reddit'
-              : item.source === 'Hacker News' ? '🟠 Hacker News'
+              : item.source === 'Hacker News' ? '🟠 HN'
               : item.source === 'GitHub' ? '🐙 GitHub'
               : '📰 其他';
     sourceStats[key] = (sourceStats[key] || 0) + 1;
@@ -735,22 +1193,23 @@ function generateHTML(news, groups) {
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 35px 30px;">
       <h1 style="margin: 0; font-size: 26px;">📰 Claude.ai 日报</h1>
       <p style="margin: 10px 0 8px 0; opacity: 0.95; font-size: 13px;">
-        ${dateStr} · 共 ${news.length} 条更新 · 最近 ${DAYS_TO_KEEP} 天
+        ${dateStr} · ${news.length} 条 (已自动去除历史推送)
       </p>
       <div style="margin-top: 8px;">${statsHTML}</div>
     </div>
-    <div style="padding: 25px 30px;">${sectionsHTML}</div>
+    <div style="padding: 25px 30px;">${allHTML}</div>
     <div style="background: #f9fafb; padding: 15px; text-align: center; font-size: 11px; color: #999;">
-      由 GitHub Actions 自动生成 · 每天 11:58 北京时间
+      由 GitHub Actions 自动生成 · 每天 11:58 北京时间 · v5.0
     </div>
   </div>
 </body>
 </html>`;
 }
 
-function generateMarkdown(news, groups) {
+// ─────────── §7.2 Markdown 渲染 ───────────
+function renderMarkdown(news, groups) {
   const date = new Date();
-  const dateStr = date.toISOString().split('T')[0];
+  const dateStr = timeUtil.isoDate(date);
   
   let md = `---
 tags:
@@ -764,18 +1223,19 @@ title: "Claude.ai 日报 - ${dateStr}"
 
 # Claude.ai 日报 - ${dateStr}
 
-> 生成时间: ${date.toLocaleString('zh-CN')}
-> 总更新数: ${news.length} (最近 ${DAYS_TO_KEEP} 天)
+> 生成时间: ${timeUtil.formatCN(date)}
+> 总更新数: ${news.length} (最近 ${CONFIG.daysToKeep} 天, 已去除历史推送)
 
 `;
   
-  const renderSection = (title, items) => {
-    if (items.length === 0) return '';
+  const renderSection = (title, items, idxStart) => {
+    if (items.length === 0) return { md: '', nextIdx: idxStart };
     let s = `\n## ${title} (${items.length})\n\n`;
-    items.forEach((item, idx) => {
-      const timeStr = new Date(item.publishedAt).toLocaleString('zh-CN');
+    let idx = idxStart;
+    items.forEach(item => {
+      const timeStr = timeUtil.formatCN(item.publishedAt);
       const icon = getSourceIcon(item.source, item.category);
-      s += `### ${idx + 1}. ${item.title}\n\n`;
+      s += `### ${idx}. ${item.title}\n\n`;
       s += `- **来源**: ${icon} ${item.source}\n`;
       s += `- **时间**: ${timeStr}\n`;
       if (item.points) s += `- **热度**: 👍 ${item.points}${item.commentsCount ? ` · 💬 ${item.commentsCount}` : ''}\n`;
@@ -784,74 +1244,105 @@ title: "Claude.ai 日报 - ${dateStr}"
         s += `\n${String(item.description).substring(0, 500)}\n`;
       }
       s += '\n---\n\n';
+      idx++;
     });
-    return s;
+    return { md: s, nextIdx: idx };
   };
   
-  md += renderSection('🌟 Anthropic 官方', groups.official);
-  md += renderSection('📅 今天', groups.today);
-  md += renderSection('📆 昨天', groups.yesterday);
-  md += renderSection('📋 本周早些时候', groups.thisWeek);
+  let idx = 1;
+  const sections = [
+    { title: '🌟 Anthropic 官方', items: groups.official },
+    { title: '📅 今天', items: groups.today },
+    { title: '📆 昨天', items: groups.yesterday },
+    { title: '📋 本周早些时候', items: groups.thisWeek },
+  ];
   
-  if (news.length === 0) md += '\n今日暂无更新。\n';
+  for (const sec of sections) {
+    const result = renderSection(sec.title, sec.items, idx);
+    md += result.md;
+    idx = result.nextIdx;
+  }
+  
+  if (news.length === 0) md += '\n今日暂无新增更新（历史已推送的内容自动过滤）。\n';
   
   return md;
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 发送邮件
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ═════════════════════════════════════════════════════════════════
+// §8 邮件层
+// ═════════════════════════════════════════════════════════════════
 
 async function sendEmail(news, html, markdown) {
-  console.log('【步骤5】发送邮件...');
+  logger.section('步骤5: 发送邮件');
   
   const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: { user: GMAIL_USER, pass: GMAIL_APP_PASSWORD },
+    auth: { user: CONFIG.gmail.user, pass: CONFIG.gmail.appPassword },
   });
   
   await transporter.verify();
-  console.log('  ✓ SMTP 连接成功');
+  logger.success('SMTP 连接成功');
   
   const date = new Date();
-  const dateStr = date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
-  const isoDate = date.toISOString().split('T')[0];
+  const subjectDate = timeUtil.formatCN(date, { month: '2-digit', day: '2-digit' });
+  const fileDate = timeUtil.isoDate(date);
   
   const result = await transporter.sendMail({
-    from: GMAIL_USER,
-    to: EMAIL_RECIPIENT,
-    subject: `Claude.ai 日报 - ${dateStr} (${news.length} 条更新)`,
+    from: CONFIG.gmail.user,
+    to: CONFIG.recipient,
+    subject: `Claude.ai 日报 - ${subjectDate} (${news.length} 条)`,
     html: html,
     attachments: [{
-      filename: `claude-news-${isoDate}.md`,
+      filename: `claude-news-${fileDate}.md`,
       content: markdown,
       contentType: 'text/markdown; charset=utf-8',
     }],
   });
   
-  console.log('  ✅ 邮件已发送!');
-  console.log(`     消息ID: ${result.messageId}`);
+  logger.success('邮件已发送!');
+  logger.info(`消息ID: ${result.messageId}`, 2);
+  logger.info(`收件人: ${CONFIG.recipient}`, 2);
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// 主流程
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ═════════════════════════════════════════════════════════════════
+// §9 主流程
+// ═════════════════════════════════════════════════════════════════
 
 async function main() {
   const startTime = Date.now();
   
-  console.log('【步骤2】并行收集 9 个数据源...\n');
+  logger.banner('Claude News Collector v5.0');
+  
+  // ─── 步骤1: 环境检查 ───
+  logger.section('步骤1: 环境检查');
+  logger.info(`GMAIL_USER: ${CONFIG.gmail.user ? '✓' : '❌'}`);
+  logger.info(`GMAIL_APP_PASSWORD: ${CONFIG.gmail.appPassword ? '✓' : '❌'}`);
+  logger.info(`时间窗口: 最近 ${CONFIG.daysToKeep} 天 (历史去重 ${CONFIG.historyDays} 天)`);
+  logger.info(`fast-xml-parser: ${XMLParser ? '✓' : '⚠️ 用降级方案'}`);
+  logger.info(`p-limit: ${pLimit ? '✓' : '⚠️ 用降级方案'}`);
+  
+  if (!CONFIG.gmail.user || !CONFIG.gmail.appPassword) {
+    logger.error('缺少必要的环境变量');
+    process.exit(1);
+  }
+  
+  // ─── 加载历史 ───
+  cache.load();
+  cache.prune();
+  
+  // ─── 步骤2: 采集 ───
+  logger.section('步骤2: 并行采集 9 个数据源');
   
   const results = await Promise.allSettled([
-    fetchHackerNews(),       // 1. HN
-    fetchReddit(),            // 2. Reddit
-    fetchGitHub(),            // 3. GitHub
-    fetchAnthropicNews(),     // 4. Anthropic官方
-    fetchGoogleNews(),        // 5. Google News (聚合西方主流)
-    fetchWesternMediaRSS(),   // 6. 西方媒体官方RSS
-    fetchChineseMediaRSS(),   // 7. 中文科技媒体
-    fetchZhihu(),             // 8. 知乎
-    fetchWeixin(),            // 9. 搜狗微信
+    fetchHackerNews(),
+    fetchReddit(),
+    fetchGitHub(),
+    fetchAnthropicNews(),
+    fetchGoogleNews(),
+    fetchWesternMediaRSS(),
+    fetchChineseMediaRSS(),
+    fetchZhihu(),
+    fetchWeixin(),
   ]);
   
   let allNews = [];
@@ -861,31 +1352,43 @@ async function main() {
     }
   });
   
-  console.log(`\n  📊 9个数据源共收集: ${allNews.length} 条原始数据`);
+  logger.info(`\n  📊 9源共: ${allNews.length} 条原始数据`);
   
-  const filtered = filterAndDedupe(allNews);
-  const groups = groupByTime(filtered);
+  // ─── 步骤3: 处理 ───
+  const news = processNews(allNews);
+  const groups = groupByTime(news);
   
-  console.log('【步骤4】生成邮件内容...');
-  console.log(`  - 🌟 官方公告: ${groups.official.length} 条`);
-  console.log(`  - 📅 今天: ${groups.today.length} 条`);
-  console.log(`  - 📆 昨天: ${groups.yesterday.length} 条`);
-  console.log(`  - 📋 本周早些时候: ${groups.thisWeek.length} 条\n`);
+  // ─── 步骤4: 渲染 ───
+  logger.section('步骤4: 生成邮件');
+  logger.info(`🌟 官方: ${groups.official.length} 条`);
+  logger.info(`📅 今天: ${groups.today.length} 条`);
+  logger.info(`📆 昨天: ${groups.yesterday.length} 条`);
+  logger.info(`📋 本周早些时候: ${groups.thisWeek.length} 条`);
   
-  const html = generateHTML(filtered, groups);
-  const markdown = generateMarkdown(filtered, groups);
+  const html = renderHTML(news, groups);
+  const markdown = renderMarkdown(news, groups);
   
-  await sendEmail(filtered, html, markdown);
+  // ─── 步骤5: 发送邮件 ───
+  await sendEmail(news, html, markdown);
+  
+  // ─── 步骤6: 保存历史 ───
+  logger.section('步骤6: 保存历史');
+  cache.save();
   
   const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-  console.log('\n═══════════════════════════════════════════');
-  console.log(`  ✅ 全部完成! (耗时 ${duration}s)`);
-  console.log('═══════════════════════════════════════════\n');
+  logger.banner(`✅ 全部完成! (耗时 ${duration}s)`);
 }
 
 // 异常捕获
-process.on('unhandledRejection', err => { console.error('未处理的Promise拒绝:', err); process.exit(1); });
-process.on('uncaughtException', err => { console.error('未捕获异常:', err); process.exit(1); });
+process.on('unhandledRejection', err => {
+  console.error('\n未处理的Promise拒绝:', err);
+  process.exit(1);
+});
+
+process.on('uncaughtException', err => {
+  console.error('\n未捕获异常:', err);
+  process.exit(1);
+});
 
 main()
   .then(() => process.exit(0))
