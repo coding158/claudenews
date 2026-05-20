@@ -1,0 +1,46 @@
+name: Claude News Collector
+
+on:
+  schedule:
+    # 每天 03:58 UTC = 11:58 北京时间 (UTC+8)
+    - cron: '58 03 * * *'
+  
+  # 允许手动触发
+  workflow_dispatch:
+
+jobs:
+  collect-news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: npm ci --prefer-offline --no-audit
+      
+      - name: 🔍 Collect Claude News
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node claudenews-main.js
+      
+      - name: ✅ Success
+        if: success()
+        run: echo "✅ Claude News Collector 执行成功!"
+
+      - name: ❌ Failure
+        if: failure()
+        run: echo "❌ Claude News Collector 执行失败，请检查日志"
+
+permissions:
+  contents: write
