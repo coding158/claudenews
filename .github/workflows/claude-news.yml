@@ -5,29 +5,36 @@ on:
     - cron: '58 03 * * *'
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   collect-news:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v6
       
-      - uses: actions/setup-node@v4.0.2
+      - uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '20'
       
-      - run: npm install
+      - name: Install Dependencies
+        run: npm install
       
-      - run: node 01-claudenews-main.js
+      - name: Run Claude News Collector
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "=== Environment Check ==="
+          node --version
+          npm --version
+          echo "Gmail user: $GMAIL_USER"
+          echo "Recipient: $EMAIL_RECIPIENT"
+          echo "Password set: $([ -n "$GMAIL_APP_PASSWORD" ] && echo yes || echo no)"
+          echo "=== Starting Script ==="
+          node 01-claudenews-main.js
 
 permissions:
   contents: write
