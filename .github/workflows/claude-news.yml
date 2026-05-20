@@ -8,6 +8,9 @@ on:
   # 允许手动触发
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   collect-news:
     runs-on: ubuntu-latest
@@ -21,10 +24,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
       
       - name: 📦 Install Dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: npm install
       
       - name: 🔍 Collect Claude News
         env:
@@ -32,7 +34,7 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node claudenews-main.js
+        run: node 01-claudenews-main.js
       
       - name: ✅ Success
         if: success()
