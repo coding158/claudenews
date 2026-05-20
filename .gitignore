@@ -13,7 +13,6 @@ yarn-debug.log*
 Thumbs.db
 temp/
 tmp/
-cache/
 .vscode/
 .idea/
 *.swp
