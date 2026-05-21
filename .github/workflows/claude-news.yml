@@ -9,17 +9,17 @@ jobs:
   collect-news:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+
     steps:
       - uses: actions/checkout@v6
-      
+
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
-      
+
       - name: Install Dependencies
         run: npm install
-      
+
       - name: Run Claude News Collector
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
@@ -31,25 +31,26 @@ jobs:
           npm --version
           echo "=== Starting Script ==="
           node 01-claudenews-main.js
-      
-      # 关键: 把历史缓存 commit 回仓库, 实现跨运行的持久化
-      - name: Commit history cache
+
+      - name: Commit cache and keepalive
         if: always()
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          
-          if [ -d "cache" ]; then
-            git add cache/
-            
-            # 只在有变化时提交
-            if git diff --staged --quiet; then
-              echo "No cache changes to commit"
-            else
-              git commit -m "chore: update history cache [skip ci]"
-              git push
-              echo "✓ Cache updated"
-            fi
+
+          # 更新时间戳文件（保持仓库活跃，防止GitHub暂停cron）
+          echo "Last run: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > .last-run
+
+          # 添加 cache 和时间戳
+          git add -f cache/ .last-run 2>/dev/null || true
+
+          # 只在有变化时提交
+          if git diff --staged --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "chore: daily update [skip ci]"
+            git push
+            echo "✓ Committed"
           fi
 
 permissions:
