@@ -230,14 +230,25 @@ const textUtil = {
     }
   },
   
-  isRelevant(text) {
-    if (!text) return false;
+  // 三态相关性：high=确信 Claude-AI / low=裸 claude（疑似人名）/ none=无关
+  // 修「西方媒体含非 Claude 新闻」：裸 "Claude"（Claude Monet 等人名）不再当作命中。
+  relevanceLevel(title, desc = '') {
+    const text = `${title || ''} ${desc || ''}`;
+    if (!text.trim()) return 'none';
     const lower = text.toLowerCase();
-    return lower.includes('claude') 
-        || lower.includes('anthropic') 
-        || text.includes('克劳德') 
-        || text.includes('安特罗匹克')
-        || text.includes('安托罗匹克');
+    const hasAnthropic = lower.includes('anthropic') || text.includes('安特罗匹克') || text.includes('安托罗匹克');
+    const hasClaude    = lower.includes('claude')    || text.includes('克劳德');
+    // AI 语境词：claude 须与其一共现，才算 Claude-AI 新闻（含产品版本号、API/模型/智能体等）
+    const aiCtx = /(anthropic|\bai\b|llm|gpt|model|模型|chatbot|大模型|人工智能|对话|助手|assistant|agent|智能体|api|token|prompt|opus|sonnet|haiku|claude\s*[0-9])/i.test(text);
+    if (hasAnthropic)       return 'high';   // anthropic 出现即确信
+    if (hasClaude && aiCtx) return 'high';   // claude + AI 语境
+    if (hasClaude)          return 'low';    // 裸 claude（疑似人名）
+    return 'none';
+  },
+
+  // 背向兼容包装：默认放行 low（社区源用）；媒体源应显式判 relevanceLevel(...) === 'high'
+  isRelevant(title, desc = '') {
+    return this.relevanceLevel(title, desc) !== 'none';
   },
 };
 
@@ -618,7 +629,7 @@ async function fetchHackerNews() {
     
     const news = [];
     hits.forEach(hit => {
-      if (!hit.title || !textUtil.isRelevant(hit.title)) return;
+      if (!hit.title || textUtil.relevanceLevel(hit.title, hit.story_text || '') !== 'high') return;
       news.push({
         title: String(hit.title),
         description: String(hit.title),
@@ -769,7 +780,7 @@ async function fetchGoogleNews() {
       const items = parseRSS(xml);
       
       items.forEach(item => {
-        if (!textUtil.isRelevant(item.title)) return;
+        if (textUtil.relevanceLevel(item.title, item.description || '') !== 'high') return;
         if (item.pubDate.getTime() < cutoffDate) return;
         
         // 标题中提取来源: "标题 - The New York Times"
@@ -826,7 +837,7 @@ async function fetchWesternMediaRSS() {
       
       items.forEach(item => {
         const text = `${item.title} ${item.description}`;
-        if (!textUtil.isRelevant(text)) return;
+        if (textUtil.relevanceLevel(item.title, item.description) !== 'high') return;
         if (item.pubDate.getTime() < cutoffDate) return;
         
         news.push({
@@ -868,7 +879,7 @@ async function fetchChineseMediaRSS() {
       
       items.forEach(item => {
         const text = `${item.title} ${item.description}`;
-        if (!textUtil.isRelevant(text)) return;
+        if (textUtil.relevanceLevel(item.title, item.description) !== 'high') return;
         if (item.pubDate.getTime() < cutoffDate) return;
         
         news.push({
@@ -1390,10 +1401,15 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-main()
-  .then(() => process.exit(0))
-  .catch(err => {
-    console.error('\n❌ 执行失败:', err.message);
-    console.error(err.stack);
-    process.exit(1);
-  });
+// 仅作为入口直接运行时才执行主流程；被 require 导入（如测试）时只导出工具，不发邮件。
+if (require.main === module) {
+  main()
+    .then(() => process.exit(0))
+    .catch(err => {
+      console.error('\n❌ 执行失败:', err.message);
+      console.error(err.stack);
+      process.exit(1);
+    });
+}
+
+module.exports = { textUtil };
