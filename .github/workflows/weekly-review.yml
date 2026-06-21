@@ -1,0 +1,48 @@
+name: Weekly Review
+
+on:
+  # 每周一 01:00 UTC ≈ 北京 09:00（周报对准点不敏感，cron 延迟无所谓）
+  schedule:
+    - cron: '0 1 * * 1'
+  workflow_dispatch:
+  # 也可由外部 cron-job.org 触发 repository_dispatch[weekly-review]
+  repository_dispatch:
+    types: [weekly-review]
+
+permissions:
+  contents: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Weekly review
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+        run: node weekly-review.js
+
+      - name: Commit review
+        if: always()
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -f archive/ 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "Nothing to commit"
+          else
+            git commit -m "chore: weekly review [skip ci]"
+            git push
+            echo "✓ Committed"
+          fi

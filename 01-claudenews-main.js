@@ -1029,9 +1029,13 @@ function processNews(rawItems) {
     return true;
   });
   logger.info(`元门禁: ${beforeGate} → ${items.length}  [${tierBreakdown(items)}]`);
+  RUN_STATS.gateInput = beforeGate;
+  RUN_STATS.gateKept = items.length;
 
   // ─── §6.3 智能去重 (相似度) ───
+  RUN_STATS.dedupBefore = items.length;
   items = dedupeBySimilarity(items, 0.75);
+  RUN_STATS.dedupAfter = items.length;
   logger.info(`相似度去重: ${items.length}`);
   
   // ─── §6.4 历史去重 ───
@@ -1137,6 +1141,9 @@ function getBorderColor(item) {
 
 // ─────────── 「元」：来源分级 + 出处（移植自 mind-body-health 的 source_tier 纪律）───────────
 const TIER_LABEL = { '🟢': '官方', '🟡': '权威媒体', '🔴': '社区/待核', '⚫': '未证实' };
+
+// 监理：本次运行的统计，供每日 run-log 与每周复盘聚合
+let RUN_STATS = { gateInput: 0, gateKept: 0, dedupBefore: 0, dedupAfter: 0 };
 
 // 🟢官方 / 🟡权威媒体(high) / 🔴社区或弱相关 / ⚫无关
 function assignTier(item) {
@@ -1431,6 +1438,25 @@ async function main() {
   try {
     require('fs').writeFileSync('.last-sent', timeUtil.isoDate(new Date()) + '\n');
   } catch (e) { logger.info('写 .last-sent 失败: ' + e.message, 2); }
+
+  // ─── 步骤5.2: 监理日志（每日一行，供 weekly-review.js 聚合）───
+  try {
+    const by_source = {}, by_tier = {};
+    news.forEach(i => {
+      by_source[i.source] = (by_source[i.source] || 0) + 1;
+      by_tier[i.source_tier] = (by_tier[i.source_tier] || 0) + 1;
+    });
+    const line = JSON.stringify({
+      date: timeUtil.isoDate(new Date()),
+      sent_at: new Date().toISOString(),
+      total: news.length,
+      by_tier,
+      by_source,
+      gate: { input: RUN_STATS.gateInput, kept: RUN_STATS.gateKept, dropped: RUN_STATS.gateInput - RUN_STATS.gateKept },
+      dedup: { before: RUN_STATS.dedupBefore, after: RUN_STATS.dedupAfter },
+    });
+    require('fs').appendFileSync('cache/run-log.jsonl', line + '\n');
+  } catch (e) { logger.info('写 run-log 失败: ' + e.message, 2); }
 
   // ─── 步骤6: 保存历史 ───
   logger.section('步骤6: 保存历史');
