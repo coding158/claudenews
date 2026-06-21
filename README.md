@@ -144,6 +144,55 @@
 
 之后每天上午 11:58（北京时间）会自动运行。
 
+> ⚠️ 仅靠 GitHub `schedule` cron 送达时间**不固定**（实测可延迟 6+ 小时）。要精准 11:58，请配置下面的「准点调度」。
+
+---
+
+## ⏰ 准点调度（让送达时间固定在 11:58）
+
+### 为什么需要
+GitHub Actions 的 `schedule:` cron 是「尽力而为」，高峰期会延迟数十分钟到数小时甚至跳过，导致每天送达时间漂移（实测最多晚 6+ 小时）。要精准送达，必须由 **CI 之外的触发器** 在固定时刻打 GitHub 的 `repository_dispatch` API。
+
+### 调度架构（本仓库工作流已内置）
+| 角色 | 机制 | 时间 |
+|------|------|------|
+| **主触发（准点）** | 外部 cron-job.org 到点 → `repository_dispatch[daily-news]` → 工作流 | 11:58 北京（精准） |
+| **兜底** | GitHub `schedule` cron，仅当外部触发挂掉时补发 | 15:00 北京（会延迟） |
+| **防双发** | workflow 的 `guard` 步骤：当天若已成功发过（`.last-sent`==今天）则跳过兜底 | — |
+
+> 不配置外部触发也能用，但只走延迟兜底；配置后才精准。
+
+### 配置步骤（一次性）
+
+**① 生成 PAT**：GitHub → Settings → Developer settings → **Fine-grained tokens**
+- Repository access：仅选 `coding158/claudenews`
+- Permissions：**Contents = Read and write** + **Metadata = Read**（经典 token 则勾 `repo`）
+
+**② 配置 [cron-job.org](https://cron-job.org)**（免费，注册后新建 cronjob）
+```
+URL:    https://api.github.com/repos/coding158/claudenews/dispatches
+Method: POST
+Headers:
+  Authorization: Bearer <你的PAT>
+  Accept: application/vnd.github+json
+  X-GitHub-Api-Version: 2022-11-28
+  User-Agent: cron-job
+Body:   {"event_type":"daily-news"}
+时区:   Asia/Shanghai，每天 11:58
+```
+
+**③ 自测**（在自己的终端运行，**勿把 PAT 贴到公开处**）：
+```bash
+curl -i -X POST -H "Authorization: Bearer <PAT>" \
+  -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/coding158/claudenews/dispatches \
+  -d '{"event_type":"daily-news"}'
+```
+返回 **`204 No Content`** 即成功；GitHub **Actions** 标签会立刻出现一次 `repository_dispatch` 触发的运行。
+
+### 验收
+连续 3 天确认：① 送达时间在 11:58±5 分钟；② 每天只有一封（`guard` 防住兜底双发）。
+
 ---
 
 ## 📂 项目结构
@@ -183,17 +232,18 @@ claudenews/
 
 ### 修改运行时间
 
-编辑 `.github/workflows/claude-news.yml`：
+**准点时间**由外部触发器决定 —— 改 [cron-job.org](https://cron-job.org) 那个 cronjob 的时间即可（见上面「⏰ 准点调度」）。
+
+**兜底时间**在 `.github/workflows/claude-news.yml` 的 `schedule`，它只在外部触发挂掉时生效、且会被 GitHub 延迟，因此设得晚于主触发：
 
 ```yaml
 schedule:
-  - cron: '58 03 * * *'   # UTC 时间，即北京时间 11:58
+  - cron: '0 7 * * *'   # UTC 07:00 ≈ 北京 15:00（兜底，会延迟）
 ```
 
-Cron 表达式参考：
+Cron 表达式参考（UTC）：
 - `'00 02 * * *'` = 北京时间 10:00
 - `'00 12 * * *'` = 北京时间 20:00
-- `'00 0 * * 1'` = 每周一北京时间 8:00
 
 工具：[crontab.guru](https://crontab.guru/)
 
@@ -414,7 +464,7 @@ user1@gmail.com,user2@example.com
 - ⚠️ **搜狗微信**：反爬严格，结果常为 0 条
 - ⚠️ **首次运行**：历史为空，所有内容都是"新"的，从第二天起去重生效
 - ⚠️ **Google News URL**：部分链接是重定向链接，点击会跳转到真实媒体
-- ⚠️ **GitHub Actions 时间**：cron 调度有 0-15 分钟延迟，11:58 设置实际可能 12:00 左右运行
+- ⚠️ **GitHub Actions cron 不准**：`schedule` 调度高峰期可延迟数十分钟到数小时（实测 6+ 小时）。要精准 11:58 须配置「⏰ 准点调度」（外部 `repository_dispatch` 触发）
 - ⚠️ **节假日**：GitHub 偶尔有维护，可能影响某天的运行
 
 ---
