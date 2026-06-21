@@ -1,12 +1,18 @@
 name: Claude News Collector
 
 on:
-  # 主调度: cron-job.org 外部触发, 精准 11:58 (见 cron-job-setup-guide.md)
+  # 主调度（准点）：外部 cron-job.org 到点带 PAT 打 repository_dispatch 触发，精准 11:58 北京。
+  # 配置见 README「准点调度」/ 设计书附录 A2。
+  repository_dispatch:
+    types: [daily-news]
+
+  # 手动触发
   workflow_dispatch:
 
-  # 兜底: GitHub cron 延迟执行, 确保即使外部服务挂了也能发出
+  # 兜底（仅当外部触发挂掉时）：GitHub cron 延迟执行，时间晚于主触发；
+  # 由 guard 步骤判断「今天是否已成功发过」避免同日双发。
   schedule:
-    - cron: '58 05 * * *'    # 05:58 UTC = 13:58 北京时间 (备用)
+    - cron: '0 7 * * *'    # 07:00 UTC ≈ 15:00 北京（晚于主触发 11:58，留时间差给 guard）
 
 jobs:
   collect-news:
@@ -16,14 +22,31 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # 护栏：若本次是 schedule 兜底且今天已由主触发成功发过(.last-sent==今天)，跳过，避免双发。
+      - name: Guard — skip duplicate send
+        id: guard
+        run: |
+          TODAY=$(TZ=Asia/Shanghai date +%F)
+          LAST=$(head -1 .last-sent 2>/dev/null | tr -d '[:space:]' || true)
+          echo "event=${{ github.event_name }} today=$TODAY last-sent=$LAST"
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$LAST" = "$TODAY" ]; then
+            echo "✅ 今天已由外部触发发过，跳过兜底。"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-node@v6
+        if: steps.guard.outputs.skip != 'true'
         with:
           node-version: '20'
 
       - name: Install Dependencies
+        if: steps.guard.outputs.skip != 'true'
         run: npm install
 
       - name: Run Claude News Collector
+        if: steps.guard.outputs.skip != 'true'
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
@@ -44,8 +67,8 @@ jobs:
           # 更新时间戳文件（保持仓库活跃，防止GitHub暂停cron）
           echo "Last run: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > .last-run
 
-          # 添加 cache 和时间戳
-          git add -f cache/ .last-run 2>/dev/null || true
+          # 添加 cache 和时间戳（含成功送达标记 .last-sent）
+          git add -f cache/ .last-run .last-sent 2>/dev/null || true
 
           # 只在有变化时提交
           if git diff --staged --quiet; then

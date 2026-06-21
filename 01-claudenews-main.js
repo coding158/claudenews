@@ -1381,7 +1381,13 @@ async function main() {
   
   // ─── 步骤5: 发送邮件 ───
   await sendEmail(news, html, markdown);
-  
+
+  // ─── 步骤5.1: 成功送达标记（仅发送成功后写入）───
+  // 供 schedule 兜底判断「今天是否已由外部精准触发发过」，避免同日双发。
+  try {
+    require('fs').writeFileSync('.last-sent', timeUtil.isoDate(new Date()) + '\n');
+  } catch (e) { logger.info('写 .last-sent 失败: ' + e.message, 2); }
+
   // ─── 步骤6: 保存历史 ───
   logger.section('步骤6: 保存历史');
   cache.save();
