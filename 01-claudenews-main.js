@@ -1018,7 +1018,18 @@ function processNews(rawItems) {
     return new Date(item.publishedAt).getTime() >= cutoffDate;
   });
   logger.info(`时间过滤: ${items.length} (最近${CONFIG.daysToKeep}天)`);
-  
+
+  // ─── §6.2.5 「元」分级 + 门禁（移植自修行项目 validate.py 的发送前门禁）───
+  const beforeGate = items.length;
+  items.forEach(enrichMeta);
+  items = items.filter(it => {
+    if (it.isOfficial) return true;             // 官方永不丢
+    if (it.relevance === 'none') return false;  // ⚫ 无关 → 丢弃
+    if (it.source_tier === '🟡' && !it.link) it.source_tier = '🔴'; // 🟡 缺出处 → 降级
+    return true;
+  });
+  logger.info(`元门禁: ${beforeGate} → ${items.length}  [${tierBreakdown(items)}]`);
+
   // ─── §6.3 智能去重 (相似度) ───
   items = dedupeBySimilarity(items, 0.75);
   logger.info(`相似度去重: ${items.length}`);
@@ -1124,21 +1135,52 @@ function getBorderColor(item) {
   return '#667eea';
 }
 
+// ─────────── 「元」：来源分级 + 出处（移植自 mind-body-health 的 source_tier 纪律）───────────
+const TIER_LABEL = { '🟢': '官方', '🟡': '权威媒体', '🔴': '社区/待核', '⚫': '未证实' };
+
+// 🟢官方 / 🟡权威媒体(high) / 🔴社区或弱相关 / ⚫无关
+function assignTier(item) {
+  if (item.isOfficial) return '🟢';
+  const rel = item.relevance || textUtil.relevanceLevel(item.title, item.description || '');
+  if (rel === 'none') return '⚫';
+  if (rel === 'low')  return '🔴';                       // 裸 claude（疑似人名）
+  if (item.category === 'western_media' || item.category === 'chinese_media') return '🟡';
+  return '🔴';                                            // HN/Reddit/GitHub/知乎/微信 等社区
+}
+
+// 给条目补「元」字段：relevance / source_tier / provenance
+function enrichMeta(item) {
+  item.relevance = item.relevance || textUtil.relevanceLevel(item.title, item.description || '');
+  item.source_tier = assignTier(item);
+  item.provenance = { url: item.link || '', fetcher: item.source || '未知' };
+  return item;
+}
+
+function tierBreakdown(items) {
+  const c = {};
+  items.forEach(i => { c[i.source_tier] = (c[i.source_tier] || 0) + 1; });
+  return ['🟢', '🟡', '🔴', '⚫'].filter(t => c[t]).map(t => `${t}${c[t]}`).join(' ') || '—';
+}
+
 // ─────────── §7.1 HTML 渲染 ───────────
 function renderItemHTML(item, idx) {
   const timeStr = timeUtil.formatDateTime(item.publishedAt);
   const icon = getSourceIcon(item.source, item.category);
   const borderColor = getBorderColor(item);
-  
+  const tier = item.source_tier || '⚫';
+  const tierBadge = `<span style="font-size:11px;">${tier}${TIER_LABEL[tier] || ''}</span>`;
+  const caution = (tier === '🔴' || tier === '⚫')
+    ? ` <span style="color:#999;font-size:11px;">（${tier === '⚫' ? '未证实' : '社区来源'}，请自行核实）</span>` : '';
+
   return `
     <div style="border-left: 4px solid ${borderColor}; padding: 12px 15px; margin: 12px 0; background: #f9fafb; border-radius: 4px;">
       <h3 style="margin: 0 0 6px 0; color: #222; font-size: 14px; line-height: 1.4;">
-        ${idx}. ${textUtil.escapeHtml(item.title)}
+        ${idx}. ${tierBadge} ${textUtil.escapeHtml(item.title)}
       </h3>
       <p style="margin: 4px 0; color: #666; font-size: 11px;">
         ${icon} <strong>${textUtil.escapeHtml(item.source)}</strong> · ${timeStr}
         ${item.points ? ` · 👍 ${item.points}` : ''}
-        ${item.commentsCount ? ` · 💬 ${item.commentsCount}` : ''}
+        ${item.commentsCount ? ` · 💬 ${item.commentsCount}` : ''}${caution}
       </p>
       ${item.description && item.description !== item.title ? 
         `<p style="margin: 6px 0; color: #555; font-size: 12px; line-height: 1.5;">${textUtil.escapeHtml(String(item.description).substring(0, 180))}${item.description.length > 180 ? '...' : ''}</p>` : ''}
@@ -1246,7 +1288,9 @@ title: "Claude.ai 日报 - ${dateStr}"
     items.forEach(item => {
       const timeStr = timeUtil.formatCN(item.publishedAt);
       const icon = getSourceIcon(item.source, item.category);
-      s += `### ${idx}. ${item.title}\n\n`;
+      const tier = item.source_tier || '⚫';
+      s += `### ${idx}. ${tier} ${item.title}\n\n`;
+      s += `- **可信度**: ${tier} ${TIER_LABEL[tier] || ''}${(tier === '🔴' || tier === '⚫') ? '（请自行核实）' : ''}\n`;
       s += `- **来源**: ${icon} ${item.source}\n`;
       s += `- **时间**: ${timeStr}\n`;
       if (item.points) s += `- **热度**: 👍 ${item.points}${item.commentsCount ? ` · 💬 ${item.commentsCount}` : ''}\n`;
@@ -1418,4 +1462,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { textUtil };
+module.exports = { textUtil, assignTier, enrichMeta, tierBreakdown, TIER_LABEL, renderItemHTML };
