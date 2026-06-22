@@ -729,30 +729,47 @@ async function fetchAnthropicNews() {
     });
     
     const html = await response.text();
-    const linkPattern = /href="(\/news\/[^"]+)"[^>]*>([^<]+)</g;
-    const seen = new Set();
+    logger.info(`HTML 长度: ${html.length}B`, 2);  // 调试：0 或极小=被挡/重定向
+
+    // anthropic.com/news 现为 JS 渲染：标题不在初始 HTML，但文章 slug 会出现在
+    // <a href> 或 __NEXT_DATA__ JSON 里。故先稳健地捞所有 /news/<slug>，链接一定对；
+    // 标题优先从就近 JSON 取，取不到用 slug 反推（Title Case）。
+    const slugSet = new Set();
+    const slugRe = /\/news\/([a-z0-9][a-z0-9-]{2,80})/g;
+    let m;
+    while ((m = slugRe.exec(html)) !== null) {
+      const slug = m[1];
+      if (['all', 'index', 'page'].includes(slug)) continue;     // 非文章路径
+      if (slug.endsWith('.png') || slug.endsWith('.jpg') || slug.endsWith('.svg')) continue;
+      slugSet.add(slug);
+    }
+    logger.info(`发现 /news/ slug: ${slugSet.size} 个`, 2);  // 调试
+
+    const titleForSlug = (slug) => {
+      // 就近匹配 "<slug>" ... "title|heading|headline":"..."（best-effort，对 __NEXT_DATA__ 有效）
+      const re = new RegExp(`${slug.replace(/[-]/g, '\\-')}[\\s\\S]{0,500}?"(?:title|heading|headline|name)"\\s*:\\s*"([^"]{4,200})"`);
+      const mm = html.match(re);
+      if (mm) return mm[1];
+      return slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());  // slug → Title Case
+    };
+
     const news = [];
-    let match;
-    
-    while ((match = linkPattern.exec(html)) !== null) {
-      const [, urlPath, title] = match;
-      const cleanTitle = title.trim();
-      if (!cleanTitle || cleanTitle.length < 5 || cleanTitle.length > 200) continue;
-      if (seen.has(urlPath)) continue;
-      seen.add(urlPath);
-      
+    for (const slug of slugSet) {
+      const title = textUtil.clean(titleForSlug(slug));
+      if (!title || title.length < 4) continue;
       news.push({
-        title: cleanTitle,
-        description: cleanTitle,
-        link: `https://www.anthropic.com${urlPath}`,
+        title,
+        description: title,
+        link: `https://www.anthropic.com/news/${slug}`,
         source: 'Anthropic Official',
         publishedAt: new Date(),
         isOfficial: true,
       });
     }
-    
+
     const result = news.slice(0, 8);
     logger.success(`${result.length} 条`, 2);
+    if (result.length === 0) logger.warn(`anthropic 0 条（html ${html.length}B / slug ${slugSet.size}）—— 若 html 很小则被挡，若 slug 为 0 则页面结构变了`, 2);
     return result;
   } catch (error) {
     logger.warn(error.message, 2);
