@@ -1204,9 +1204,12 @@ function renderItemHTML(item, idx) {
       <p style="margin: 4px 0; color: #666; font-size: 11px;">
         ${icon} <strong>${textUtil.escapeHtml(item.source)}</strong> · ${timeStr}
         ${item.points ? ` · 👍 ${item.points}` : ''}
-        ${item.commentsCount ? ` · 💬 ${item.commentsCount}` : ''}${caution}
+        ${item.commentsCount ? ` · 💬 ${item.commentsCount}` : ''}
+        ${item.aiSummary ? ` · <span style="color:#10b981;">✦ AI摘要</span>` : ''}${caution}
       </p>
-      ${item.description && item.description !== item.title ? 
+      ${item.aiSummary ?
+        `<p style="margin: 6px 0; color: #10b981; font-size: 12px; line-height: 1.5;">✦ ${textUtil.escapeHtml(item.aiSummary)}</p>` : ''}
+      ${item.description && item.description !== item.title ?
         `<p style="margin: 6px 0; color: #555; font-size: 12px; line-height: 1.5;">${textUtil.escapeHtml(String(item.description).substring(0, 180))}${item.description.length > 180 ? '...' : ''}</p>` : ''}
       ${item.link ? `<a href="${textUtil.escapeHtml(item.link)}" style="color: ${borderColor}; text-decoration: none; font-size: 12px;">→ 查看详情</a>` : ''}
     </div>`;
@@ -1319,6 +1322,7 @@ title: "Claude.ai 日报 - ${dateStr}"
       s += `- **时间**: ${timeStr}\n`;
       if (item.points) s += `- **热度**: 👍 ${item.points}${item.commentsCount ? ` · 💬 ${item.commentsCount}` : ''}\n`;
       if (item.link) s += `- **链接**: ${item.link}\n`;
+      if (item.aiSummary) s += `- **AI摘要**: ${item.aiSummary}\n`;
       if (item.description && item.description !== item.title) {
         s += `\n${String(item.description).substring(0, 500)}\n`;
       }
@@ -1435,6 +1439,14 @@ async function main() {
   
   // ─── 步骤3: 处理 ───
   const news = processNews(allNews);
+
+  // ─── 步骤3.5: AI 摘要（provider 可配；失败不影响发信）───
+  try {
+    await require('./summarize').summarize(news);
+  } catch (e) {
+    logger.warn('AI 摘要失败（不影响发信）: ' + e.message);
+  }
+
   const groups = groupByTime(news);
   
   // ─── 步骤4: 渲染 ───

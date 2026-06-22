@@ -51,6 +51,11 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+          # AI 摘要：默认用 GitHub Models（免费，靠下面 models: read 权限 + GITHUB_TOKEN）
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'github' }}
+          GITHUB_TOKEN: ${{ github.token }}
+          # 想改用 DeepSeek：设 AI_PROVIDER=deepseek（仓库 Variables）+ 加 DEEPSEEK_API_KEY secret
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
           echo "=== Environment Check ==="
           node --version
@@ -81,3 +86,4 @@ jobs:
 
 permissions:
   contents: write
+  models: read      # GitHub Models（AI 摘要）免费推理所需
