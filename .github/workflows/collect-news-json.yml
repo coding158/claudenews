@@ -1,0 +1,53 @@
+name: Collect News JSON (overseas → Gitee)
+
+# 海外采集层：在 GitHub 海外 runner 采集被墙源，生成 news.json，push 到 Gitee 供 Gitee Go 消费。
+# 与现有发 Gmail 的 claude-news.yml 互不影响（这是独立的新流水线）。
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub cron 会延迟（实测可晚数小时），故跑两次、都远早于 Gitee Go 的 11:58，确保 news.json 够新。
+    - cron: '0 20 * * *'   # 20:00 UTC ≈ 北京次日 04:00（大缓冲）
+    - cron: '0 1 * * *'    # 01:00 UTC ≈ 北京 09:00（兜底）
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Collect → news.json
+        run: PROFILE=collect node run.js
+
+      - name: Push news.json to Gitee
+        env:
+          # 在本仓库 Settings → Secrets and variables → Actions 添加 GITEE_TOKEN（Gitee 私人令牌，含目标仓库读写）
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          set -e
+          if [ ! -f news.json ]; then echo "news.json 不存在，终止"; exit 1; fi
+          if [ -z "$GITEE_TOKEN" ]; then echo "未配置 GITEE_TOKEN secret，终止"; exit 1; fi
+          git clone --depth 1 "https://oauth2:${GITEE_TOKEN}@gitee.com/coding158/claude-news-daily.git" gitee_repo
+          cp news.json gitee_repo/news.json
+          cd gitee_repo
+          git config user.email "github-actions@users.noreply.github.com"
+          git config user.name "github-actions"
+          git add news.json
+          if git diff --staged --quiet; then
+            echo "news.json 无变化，跳过提交"
+          else
+            git commit -m "data: 更新 news.json [skip ci]"
+            git push origin HEAD:master
+            echo "✓ news.json 已推送到 Gitee"
+          fi

@@ -1488,4 +1488,11 @@ if (require.main === module) {
     });
 }
 
-module.exports = { textUtil, assignTier, enrichMeta, tierBreakdown, TIER_LABEL, renderItemHTML };
+module.exports = {
+  textUtil, assignTier, enrichMeta, tierBreakdown, TIER_LABEL, renderItemHTML,
+  // —— 采集函数（供 engine 的 Source 元复用；仅 require 时使用，不影响发邮件主流程）——
+  fetchHackerNews, fetchReddit, fetchGitHub, fetchAnthropicNews, fetchGoogleNews,
+  fetchWesternMediaRSS, fetchChineseMediaRSS, fetchZhihu, fetchWeixin,
+  // —— 处理/渲染/发信/缓存（供 engine 复用，保证与 live 主流程同一套逻辑）——
+  processNews, groupByTime, renderHTML, renderMarkdown, sendEmail, cache,
+};

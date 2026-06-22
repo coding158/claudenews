@@ -16,3 +16,6 @@ tmp/
 .vscode/
 .idea/
 *.swp
+
+# 采集器运行时产物（由 workflow 推到 Gitee，不入本仓库）
+news.json
