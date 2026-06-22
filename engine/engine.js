@@ -40,10 +40,17 @@ async function run(profileName) {
   console.log(`启用源：${sel.map(s => s.name).join(', ') || '（无）'}`);
   const res = await Promise.allSettled(sel.map(s => Promise.resolve().then(() => s.fetch())));
   let items = [];
+  const empty = [], failed = [];
   res.forEach((r, i) => {
-    if (r.status === 'fulfilled' && Array.isArray(r.value)) { items = items.concat(r.value); console.log(`  ${sel[i].name}: ${r.value.length}`); }
-    else console.warn(`  ${sel[i].name} 失败: ${(r.reason && r.reason.message) || ''}`);
+    if (r.status === 'fulfilled' && Array.isArray(r.value)) {
+      items = items.concat(r.value);
+      console.log(`  ${sel[i].name}: ${r.value.length}`);
+      if (r.value.length === 0) empty.push(sel[i].name);
+    } else { console.warn(`  ${sel[i].name} 失败: ${(r.reason && r.reason.message) || ''}`); failed.push(sel[i].name); }
   });
+  // 源健康汇总：让"某源长期 0 条/报错"可见
+  if (empty.length) console.warn(`  ⚠️  0 条的源：${empty.join(', ')}（疑似失效/反爬/无匹配）`);
+  if (failed.length) console.error(`  ✗ 报错的源：${failed.join(', ')}`);
   console.log(`共采集：${items.length} 条`);
 
   let groups = null, html = '', markdown = '';
