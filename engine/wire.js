@@ -51,6 +51,7 @@ function writeWire(items, p = WIRE, source = 'github-actions/claudenews') {
       isOfficial: !!it.isOfficial,
       points: it.points || 0,
       commentsCount: it.commentsCount || 0,
+      aiSummary: it.aiSummary || '',   // 海外端 GitHub Models 摘要，随合同带给国内
     })),
   };
   fs.writeFileSync(p, JSON.stringify(out, null, 2), 'utf-8');

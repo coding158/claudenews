@@ -30,6 +30,7 @@
 | `isOfficial` | bool |  | 是否官方公告（消费侧置顶、永不被过滤） |
 | `points` | number |  | 热度 / 分数 |
 | `commentsCount` | number |  | 评论数 |
+| `aiSummary` | string |  | 一句话中文摘要（采集端用 GitHub Models 免费生成，消费端直接用、省 DeepSeek） |
 
 ## 消费侧字段映射（Gitee 内部中文字段）
 

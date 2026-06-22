@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  models: read      # 采集时用 GitHub Models（免费）生成摘要，随 news.json 带给 Gitee（省 DeepSeek）
 
 jobs:
   collect:
@@ -28,6 +29,10 @@ jobs:
         run: npm install
 
       - name: Collect → news.json
+        env:
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'github' }}   # 免费 GitHub Models 摘要
+          GITHUB_TOKEN: ${{ github.token }}
+          # AI_MAX_SUMMARIZE: 80   # 可选：限制摘要条数省配额（默认 80）
         run: PROFILE=collect node run.js
 
       - name: Push news.json to Gitee

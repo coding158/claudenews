@@ -55,6 +55,13 @@ async function run(profileName) {
 
   let groups = null, html = '', markdown = '';
   if (profile.gate) { items = lightGate(items); console.log(`轻门禁后：${items.length} 条`); }
+  if (profile.summarize) {
+    // 海外端摘要（免费 GitHub Models）：按时间倒序取前 N 条摘要，省配额；摘要随 news.json 带给国内。
+    items.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+    const cap = parseInt(process.env.AI_MAX_SUMMARIZE || '80', 10);
+    try { await require('../summarize').summarize(items.slice(0, cap)); }
+    catch (e) { console.warn('  摘要失败(不影响采集):', e.message); }
+  }
   if (profile.process) {
     m.cache.load(); m.cache.prune();
     items = m.processNews(items);

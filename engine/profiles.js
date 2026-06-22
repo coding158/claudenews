@@ -7,9 +7,10 @@
 
 module.exports = {
   collect: {
-    描述: '采集海外源 → 写 news.json（推 Gitee 消费）',
+    描述: '采集海外源 → AI摘要 → 写 news.json（推 Gitee 消费）',
     sources: ['hackernews', 'reddit', 'github', 'anthropic', 'googlenews', 'westernrss', 'chineserss', 'zhihu', 'weixin'],
-    gate: true,        // 轻门禁：相关性(丢 none)+时间窗+标题去重；不做历史去重/摘要
+    gate: true,        // 轻门禁：相关性(丢 none)+时间窗+标题去重；不做历史去重
+    summarize: true,   // 在海外端用 GitHub Models(免费)生成摘要，随 news.json 带给国内，省 Gitee 的 DeepSeek
     process: false,
     render: false,
     sinks: ['wire-out'],
