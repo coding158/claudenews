@@ -1,0 +1,32 @@
+name: Consume news.json → Gmail (reverse)
+
+# 反向流的 GitHub 半边：读本仓库 news.json（由 Gitee 反向采集推来）→ 处理 → 发 Gmail。
+# 与正向采集 collect-news-json.yml、以及 live 的 claude-news.yml 各自独立、互不影响。
+# news.json 的喂入见 Gitee 的 .workflow/reverse-collect.yml（把国内采集结果推到本仓库）。
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 反向送达时间，按需调整；应晚于 Gitee 反向采集把 news.json 推来的时间。
+    - cron: '0 4 * * *'   # 04:00 UTC ≈ 北京 12:00
+
+permissions:
+  contents: read
+
+jobs:
+  mail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install
+      - name: Consume news.json → Gmail
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
+        run: PROFILE=consume node run.js
