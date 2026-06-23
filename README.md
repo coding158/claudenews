@@ -1,5 +1,8 @@
 # claudenews
 收集claude.ai公司的最新进展情况，包括主要负责人的新闻和产品推广等
+
+> ⚠️ **本 README 是 v5「单文件→Gmail」描述；现已新增"元引擎 + 跨端采集(→ Gitee 139)+ GitHub Models 免费摘要"。当前全貌见 [`CURRENT_STATE.md`](CURRENT_STATE.md)。**（2026-06-23）
+
 <div align="center">
 
 # 📰 Claude News Collector
