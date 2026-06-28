@@ -23,7 +23,17 @@ GitHub 海外采集 → `news.json` 合同 → Gitee 国内消费 → 139 发信
 ## 已纳入 canonical 的元（自动生成，随迁移增长）
 | 类型 | 名称 | 说明 | region | 投影 |
 |---|---|---|---|---|
+| source | `anthropic` | Anthropic 官方新闻 (anthropic.com/news) | overseas | github / gitee |
+| source | `chineserss` | 中文科技媒体 RSS（36氪/机器之心/量子位等） | domestic | github / gitee |
 | source | `github` | GitHub 热门 Claude/Anthropic 相关仓库 | any | github / gitee |
+| source | `googlenews` | Google News Claude/Anthropic 相关 | overseas | github |
+| source | `hackernews` | Hacker News 热门 (news.ycombinator.com) | overseas | github |
+| source | `newsjson` | Wire 源：读 news.json（海外采集层产物） | any | github / gitee |
+| source | `reddit` | Reddit Claude/Anthropic 相关讨论 | overseas | github |
+| source | `weibo` | 微博热搜 Claude/Anthropic 相关 | domestic | gitee |
+| source | `weixin` | 微信公众号 Claude/Anthropic 相关文章 | domestic | github / gitee |
+| source | `westernrss` | 西方科技媒体 RSS (The Verge/TechCrunch/Ars Technica 等) | overseas | github |
+| source | `zhihu` | 知乎 Claude/Anthropic 相关讨论 | domestic | github / gitee |
 
 ## 调度
 GitHub collect：北京 04:00 / 09:00（早于 Gitee 11:58）。Gitee consume：每天 11:58。GitHub live Gmail：repository_dispatch 准点 + schedule 兜底。
