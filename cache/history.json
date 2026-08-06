@@ -2,26 +2,26 @@
   "items": {
     "8dd895f20081": {
       "firstSeen": 1779288344794,
-      "lastSeen": 1785902311848,
-      "count": 80,
+      "lastSeen": 1785988719777,
+      "count": 81,
       "title": "[affaan-m/ECC] The agent harness performance optimization system. Skills, instincts, memory, securit"
     },
     "c4226b4c03ee": {
       "firstSeen": 1779288344794,
-      "lastSeen": 1785902311848,
-      "count": 80,
+      "lastSeen": 1785988719777,
+      "count": 81,
       "title": "[thedotmack/claude-mem] Persistent Context Across Sessions for Every Agent –  Captures everything yo"
     },
     "e4f9223f5cc0": {
       "firstSeen": 1779288344794,
-      "lastSeen": 1785902311848,
-      "count": 80,
+      "lastSeen": 1785988719777,
+      "count": 81,
       "title": "[shanraisshan/claude-code-best-practice] from vibe coding to agentic engineering - practice makes cl"
     },
     "b0f6846ab4d5": {
       "firstSeen": 1780821653800,
-      "lastSeen": 1785902311848,
-      "count": 53,
+      "lastSeen": 1785988719777,
+      "count": 54,
       "title": "[danny-avila/LibreChat] Enhanced ChatGPT Clone: Features Agents, MCP, Skills, DeepSeek, Anthropic, A"
     },
     "01709cce8af1": {
@@ -32,8 +32,8 @@
     },
     "292a79a37feb": {
       "firstSeen": 1782878310597,
-      "lastSeen": 1785902311848,
-      "count": 36,
+      "lastSeen": 1785988719777,
+      "count": 37,
       "title": "Claude Sonnet 5"
     },
     "d03584cd398b": {
@@ -44,20 +44,20 @@
     },
     "466030493a51": {
       "firstSeen": 1782878310597,
-      "lastSeen": 1785902311848,
-      "count": 36,
+      "lastSeen": 1785988719777,
+      "count": 37,
       "title": "Redeploying Fable 5"
     },
     "a15bca80d84b": {
       "firstSeen": 1783051106348,
-      "lastSeen": 1785902311848,
-      "count": 34,
+      "lastSeen": 1785988719777,
+      "count": 35,
       "title": "[hesreallyhim/awesome-claude-code] A hand-picked collection of the finest of resources for the most "
     },
     "009c6a1ea4c4": {
       "firstSeen": 1783655905786,
-      "lastSeen": 1785902311848,
-      "count": 27,
+      "lastSeen": 1785988719777,
+      "count": 28,
       "title": "Hard Questions"
     },
     "9aea0963ddd7": {
@@ -338,8 +338,8 @@
     },
     "f0dc84806b39": {
       "firstSeen": 1784692700690,
-      "lastSeen": 1785902311848,
-      "count": 15,
+      "lastSeen": 1785988719777,
+      "count": 16,
       "title": "[santifer/career-ops] Open-source AI job search: scan job portals, evaluate listings with a structur"
     },
     "e31e52c1d6d4": {
@@ -1004,8 +1004,8 @@
     },
     "7be8ebc9ba71": {
       "firstSeen": 1784951907284,
-      "lastSeen": 1785902311848,
-      "count": 12,
+      "lastSeen": 1785988719777,
+      "count": 13,
       "title": "Claude Opus 5"
     },
     "ee391b569f80": {
@@ -1454,14 +1454,14 @@
     },
     "8e25bdccb5a1": {
       "firstSeen": 1785124703076,
-      "lastSeen": 1785902311848,
-      "count": 8,
+      "lastSeen": 1785988719777,
+      "count": 9,
       "title": "[JuliusBrussee/caveman] 🪨 why use many token when few token do trick — Claude Code skill that cuts "
     },
     "629407ce714c": {
       "firstSeen": 1785124703076,
-      "lastSeen": 1785902311848,
-      "count": 10,
+      "lastSeen": 1785988719777,
+      "count": 11,
       "title": "[asgeirtj/system_prompts_leaks] Extracted system prompts from Anthropic - Claude Fable 5, Opus 5, Cl"
     },
     "6f78dd549e7c": {
@@ -1574,14 +1574,14 @@
     },
     "cf6025aac71b": {
       "firstSeen": 1785211107805,
-      "lastSeen": 1785902311848,
-      "count": 9,
+      "lastSeen": 1785988719777,
+      "count": 10,
       "title": "Position Open Weights Models"
     },
     "105ce1bc4bba": {
       "firstSeen": 1785211107805,
-      "lastSeen": 1785902311848,
-      "count": 9,
+      "lastSeen": 1785988719777,
+      "count": 10,
       "title": "Cognizant Anthropic"
     },
     "120dcf9f36cc": {
@@ -2144,8 +2144,8 @@
     },
     "cc53b2530943": {
       "firstSeen": 1785470300608,
-      "lastSeen": 1785902311848,
-      "count": 6,
+      "lastSeen": 1785988719777,
+      "count": 7,
       "title": "Investigating Incidents Cybersecurity Evals"
     },
     "0539ac5797f3": {
@@ -2228,8 +2228,8 @@
     },
     "91fdb07c51e9": {
       "firstSeen": 1785470300608,
-      "lastSeen": 1785902311847,
-      "count": 6,
+      "lastSeen": 1785988719776,
+      "count": 7,
       "title": "Anthropic’s Claude AI models hack into 3 outside groups during testing"
     },
     "ef579b80469f": {
@@ -2264,8 +2264,8 @@
     },
     "2a6ce1512e1f": {
       "firstSeen": 1785470300609,
-      "lastSeen": 1785902311847,
-      "count": 6,
+      "lastSeen": 1785988719777,
+      "count": 7,
       "title": "Anthropic's Claude breached 3 orgs, uploaded PyPI malware during tests"
     },
     "6226c7aa6225": {
@@ -2378,8 +2378,8 @@
     },
     "37233efb18e9": {
       "firstSeen": 1785556703045,
-      "lastSeen": 1785902311847,
-      "count": 5,
+      "lastSeen": 1785988719776,
+      "count": 6,
       "title": "Claude 5 family's hallucinations look a lot like internal Anthropic emails"
     },
     "6767b48000d2": {
@@ -2744,14 +2744,14 @@
     },
     "a83792d4efdb": {
       "firstSeen": 1785643102874,
-      "lastSeen": 1785902311847,
-      "count": 4,
+      "lastSeen": 1785988719776,
+      "count": 5,
       "title": "Anthropic brags that its models committing crimes without being told to do so"
     },
     "d235e05bdfd8": {
       "firstSeen": 1785643102874,
-      "lastSeen": 1785902311847,
-      "count": 4,
+      "lastSeen": 1785988719776,
+      "count": 5,
       "title": "Show HN: Wienerdog – memory and self-improving skills for Claude Code/Codex"
     },
     "07b3cb58f034": {
@@ -2846,8 +2846,8 @@
     },
     "e35ff2c3279e": {
       "firstSeen": 1785729507370,
-      "lastSeen": 1785902311847,
-      "count": 3,
+      "lastSeen": 1785988719776,
+      "count": 4,
       "title": "Anthropic's Fever Dream: Claude's package that stole real keys"
     },
     "9a095bc5c71c": {
@@ -2900,14 +2900,14 @@
     },
     "c9e6e5823b30": {
       "firstSeen": 1785815909339,
-      "lastSeen": 1785902311847,
-      "count": 2,
+      "lastSeen": 1785988719776,
+      "count": 3,
       "title": "Claude gen-5 models show significant regression in BullshitBench"
     },
     "f6d604d40068": {
       "firstSeen": 1785815909339,
-      "lastSeen": 1785902311847,
-      "count": 2,
+      "lastSeen": 1785988719776,
+      "count": 3,
       "title": "Show HN: Chinese are offering Claude/Codex offers 90% off"
     },
     "b2e05aecedd9": {
@@ -3026,32 +3026,32 @@
     },
     "d62cb5864109": {
       "firstSeen": 1785902311847,
-      "lastSeen": 1785902311847,
-      "count": 1,
+      "lastSeen": 1785988719776,
+      "count": 2,
       "title": "Show HN: A faster coding agent than Codex and Claude Code"
     },
     "f91e20fd57a3": {
       "firstSeen": 1785902311847,
-      "lastSeen": 1785902311847,
-      "count": 1,
+      "lastSeen": 1785988719776,
+      "count": 2,
       "title": "Show HN: Neal – Codex writes the code, Claude reviews it"
     },
     "7782dbec8f23": {
       "firstSeen": 1785902311847,
-      "lastSeen": 1785902311847,
-      "count": 1,
+      "lastSeen": 1785988719776,
+      "count": 2,
       "title": "Why is Anthropic's public writing style so unlike Claude's?"
     },
     "f8b1d956fb30": {
       "firstSeen": 1785902311847,
-      "lastSeen": 1785902311847,
-      "count": 1,
+      "lastSeen": 1785988719776,
+      "count": 2,
       "title": "Deep Dive: Anthropic's Performance Take-Home (The One Claude Beat Humans At)"
     },
     "f8cac3c7116a": {
       "firstSeen": 1785902311848,
-      "lastSeen": 1785902311848,
-      "count": 1,
+      "lastSeen": 1785988719777,
+      "count": 2,
       "title": "Tino Cuellar"
     },
     "477e7ac5c06f": {
@@ -3176,22 +3176,70 @@
     },
     "651fbf2fa959": {
       "firstSeen": 1785902311849,
-      "lastSeen": 1785902311849,
-      "count": 1,
+      "lastSeen": 1785988719777,
+      "count": 2,
       "title": "OK, Well, Rogue AI Agents Are Hacking Again"
     },
     "d859952eda44": {
       "firstSeen": 1785902311849,
-      "lastSeen": 1785902311849,
-      "count": 1,
+      "lastSeen": 1785988719777,
+      "count": 2,
       "title": "The White House Is Keeping Its AI Cybersecurity Framework Secret"
     },
     "f176eceb2e7b": {
       "firstSeen": 1785902311849,
-      "lastSeen": 1785902311849,
-      "count": 1,
+      "lastSeen": 1785988719777,
+      "count": 2,
       "title": "开源版Claude Science来了！零依赖、MIT协议，内置30+项科研Skills"
+    },
+    "189cc228f0bb": {
+      "firstSeen": 1785988719776,
+      "lastSeen": 1785988719776,
+      "count": 1,
+      "title": "Is M365 Copilot sending some prompts to Anthropic?"
+    },
+    "667a395fe262": {
+      "firstSeen": 1785988719776,
+      "lastSeen": 1785988719776,
+      "count": 1,
+      "title": "Ask HN: How to turn Claude Code into an effective software engineer"
+    },
+    "ae2fe0a2faa6": {
+      "firstSeen": 1785988719776,
+      "lastSeen": 1785988719776,
+      "count": 1,
+      "title": "Anthropic Is Building Its Own Chip"
+    },
+    "a7ef26b0201d": {
+      "firstSeen": 1785988719777,
+      "lastSeen": 1785988719777,
+      "count": 1,
+      "title": "Rogue AI agents created fake online identities in another hacking attempt"
+    },
+    "3134eaa01039": {
+      "firstSeen": 1785988719777,
+      "lastSeen": 1785988719777,
+      "count": 1,
+      "title": "Anthropic’s AI used fake identities, malware in rogue attack on GitHub project"
+    },
+    "d9ca5c88dd27": {
+      "firstSeen": 1785988719777,
+      "lastSeen": 1785988719777,
+      "count": 1,
+      "title": "Meta enters the AI coding wars with Muse Spark 1.2 and Muse Code with persistent async background ag"
+    },
+    "bcf15b6e7c16": {
+      "firstSeen": 1785988719777,
+      "lastSeen": 1785988719777,
+      "count": 1,
+      "title": "Claude Mythos 5 made sock puppet accounts to socially engineer developers: here's what enterprises s"
+    },
+    "d1bd2c36a566": {
+      "firstSeen": 1785988719777,
+      "lastSeen": 1785988719777,
+      "count": 1,
+      "title": "开出AI界最高薪的Anthropic，抱怨员工为钱而来？全网“阴阳”：和你死活反开源一样"
     }
   },
-  "lastRun": "2026-08-05T03:58:37.058Z"
+  "lastRun": "2026-08-06T03:58:42.037Z"
 }
