@@ -2,26 +2,26 @@
   "items": {
     "8dd895f20081": {
       "firstSeen": 1779288344794,
-      "lastSeen": 1794887904963,
-      "count": 190,
+      "lastSeen": 1794933299538,
+      "count": 191,
       "title": "[affaan-m/ECC] The agent harness performance optimization system. Skills, instincts, memory, securit"
     },
     "c4226b4c03ee": {
       "firstSeen": 1779288344794,
-      "lastSeen": 1794887904963,
-      "count": 190,
+      "lastSeen": 1794933299538,
+      "count": 191,
       "title": "[thedotmack/claude-mem] Persistent Context Across Sessions for Every Agent –  Captures everything yo"
     },
     "e4f9223f5cc0": {
       "firstSeen": 1779288344794,
-      "lastSeen": 1794887904963,
-      "count": 190,
+      "lastSeen": 1794933299538,
+      "count": 191,
       "title": "[shanraisshan/claude-code-best-practice] from vibe coding to agentic engineering - practice makes cl"
     },
     "a15bca80d84b": {
       "firstSeen": 1783051106348,
-      "lastSeen": 1794887904963,
-      "count": 144,
+      "lastSeen": 1794933299538,
+      "count": 145,
       "title": "[hesreallyhim/awesome-claude-code] A hand-picked collection of the finest of resources for the most "
     },
     "eec2c3d676f9": {
@@ -56,32 +56,32 @@
     },
     "ac8b227c14fb": {
       "firstSeen": 1792382303762,
-      "lastSeen": 1794887904963,
-      "count": 33,
+      "lastSeen": 1794933299538,
+      "count": 34,
       "title": "Public Benefit Fund"
     },
     "bccd1749fc2f": {
       "firstSeen": 1792555100866,
-      "lastSeen": 1794887904963,
-      "count": 31,
+      "lastSeen": 1794933299538,
+      "count": 32,
       "title": "Announcements"
     },
     "9f034b639487": {
       "firstSeen": 1792555100866,
-      "lastSeen": 1794887904963,
-      "count": 31,
+      "lastSeen": 1794933299538,
+      "count": 32,
       "title": "Features"
     },
     "1fa55a84548e": {
       "firstSeen": 1792555100866,
-      "lastSeen": 1794283103386,
-      "count": 6,
+      "lastSeen": 1794933299539,
+      "count": 7,
       "title": "Anthropic says it blocked potential AI bioweapon misuse - ABC News"
     },
     "7149b86e59f7": {
       "firstSeen": 1792641502688,
-      "lastSeen": 1794887904963,
-      "count": 30,
+      "lastSeen": 1794933299538,
+      "count": 31,
       "title": "[cheaper-inference/OmniRoute] Never stop coding. Free MIT AI gateway: one endpoint, 375 providers (1"
     },
     "610e6a42f981": {
@@ -92,51 +92,27 @@
     },
     "ea77d25445ff": {
       "firstSeen": 1793073501104,
-      "lastSeen": 1794887904963,
-      "count": 25,
+      "lastSeen": 1794933299538,
+      "count": 26,
       "title": "S1 Sec"
     },
     "ccc44ce7cfab": {
       "firstSeen": 1793073501104,
-      "lastSeen": 1794887904963,
-      "count": 11,
+      "lastSeen": 1794933299538,
+      "count": 12,
       "title": "Anthropic IPO: What investors should know about buying in"
-    },
-    "17f2681bf5c6": {
-      "firstSeen": 1793073501104,
-      "lastSeen": 1793678302676,
-      "count": 3,
-      "title": "Anthropic sued for allegedly training Claude on Elvis Presley's music"
     },
     "fd32e4f5c9f6": {
       "firstSeen": 1793159902036,
-      "lastSeen": 1794887904963,
-      "count": 24,
+      "lastSeen": 1794933299538,
+      "count": 25,
       "title": "Expanding Partnership Gsa"
     },
     "ce2e6aff420d": {
       "firstSeen": 1793159902036,
-      "lastSeen": 1794887904963,
-      "count": 24,
+      "lastSeen": 1794933299538,
+      "count": 25,
       "title": "Partnerships"
-    },
-    "aa4cf5f4357c": {
-      "firstSeen": 1793159902036,
-      "lastSeen": 1793678302675,
-      "count": 8,
-      "title": "Early progress on accelerating drug development with Claude"
-    },
-    "464c3215d42f": {
-      "firstSeen": 1793159902036,
-      "lastSeen": 1793678302675,
-      "count": 8,
-      "title": "Expanding our partnership with GSA to bring Claude to all levels of government"
-    },
-    "ea3ccb7eb1a6": {
-      "firstSeen": 1793159902036,
-      "lastSeen": 1793678302675,
-      "count": 8,
-      "title": "How AI agents shape experts’ judgment calls"
     },
     "df33b7e116cf": {
       "firstSeen": 1793159902036,
@@ -144,47 +120,11 @@
       "count": 9,
       "title": "Anthropic says its AI models hacked 3 organizations on their own during tests - ABC News"
     },
-    "325d4a444437": {
-      "firstSeen": 1793159902036,
-      "lastSeen": 1793678302675,
-      "count": 8,
-      "title": "Claude AI now writes over 90% of the code at Anthropic; company in its IPO filing says: The job of a"
-    },
     "0e13ef4e33d1": {
       "firstSeen": 1793159902036,
       "lastSeen": 1793937504975,
       "count": 9,
       "title": "Anthropic sued for allegedly using Elvis Presley’s music to train Claude AI"
-    },
-    "a07edff69067": {
-      "firstSeen": 1793159902036,
-      "lastSeen": 1793678302676,
-      "count": 8,
-      "title": "Anthropic illegally trained Claude with Stanford professors’ books"
-    },
-    "24da5fb0add7": {
-      "firstSeen": 1793159902036,
-      "lastSeen": 1793678302675,
-      "count": 8,
-      "title": "Anthropic says children have used its Claude AI as it flags mental health unknowns"
-    },
-    "4552449d3cb4": {
-      "firstSeen": 1793159902036,
-      "lastSeen": 1793678302676,
-      "count": 8,
-      "title": "Anthropic Expands Integrations With Claude for Financial Advisors"
-    },
-    "824a47a9d712": {
-      "firstSeen": 1793159902037,
-      "lastSeen": 1793678302676,
-      "count": 8,
-      "title": "FINNY Comes to Anthropic’s Claude for Financial Advisors, Bringing Campaign Results and Prospect Dat"
-    },
-    "e7920311dbce": {
-      "firstSeen": 1793159902037,
-      "lastSeen": 1793678302676,
-      "count": 8,
-      "title": "Anthropic now lets Claude users jump out of plane without parachute"
     },
     "b0ff16f00644": {
       "firstSeen": 1793246303010,
@@ -194,8 +134,8 @@
     },
     "2cbb1053f081": {
       "firstSeen": 1793246303010,
-      "lastSeen": 1794887904963,
-      "count": 23,
+      "lastSeen": 1794933299538,
+      "count": 24,
       "title": "Ai For Science Expands Foundations Research Institutions"
     },
     "50f264850139": {
@@ -288,24 +228,6 @@
       "count": 8,
       "title": "SentinelOne to Add Anthropic’s Claude Mythos 5.1 to Wayfinder Frontier AI Services"
     },
-    "40650d361ad6": {
-      "firstSeen": 1793419102355,
-      "lastSeen": 1793678302675,
-      "count": 5,
-      "title": "Anthropic hacked to deliver remote access trojan to Claude developer laptops"
-    },
-    "0e7055e89adb": {
-      "firstSeen": 1793419102355,
-      "lastSeen": 1793678302675,
-      "count": 5,
-      "title": "Anthropic is renaming their Max plans"
-    },
-    "e529af467538": {
-      "firstSeen": 1793419102355,
-      "lastSeen": 1793678302675,
-      "count": 5,
-      "title": "Show HN: Convert Anthropic and OpenAI bill exports to FinOps FOCUS (open source)"
-    },
     "c05b8cc70017": {
       "firstSeen": 1793419102356,
       "lastSeen": 1793937504975,
@@ -329,12 +251,6 @@
       "lastSeen": 1793851102397,
       "count": 7,
       "title": "Anthropic orders AI tool Claude to stop remaking video games"
-    },
-    "267b5015d8e8": {
-      "firstSeen": 1793419102356,
-      "lastSeen": 1793678302676,
-      "count": 5,
-      "title": "Cursor Confirms Anthropic Claude Code Extension Compromised"
     },
     "d62e5bf58b5f": {
       "firstSeen": 1793419102356,
@@ -378,12 +294,6 @@
       "count": 8,
       "title": "Anthropic VS code extension on Cursor backdoored for nearly 12 hours"
     },
-    "85d40da0514a": {
-      "firstSeen": 1793419102357,
-      "lastSeen": 1793678302676,
-      "count": 5,
-      "title": "How a Contractor’s Claude Agent Got Into the Pentagon"
-    },
     "5147d11445bf": {
       "firstSeen": 1793505502964,
       "lastSeen": 1794023903385,
@@ -395,12 +305,6 @@
       "lastSeen": 1793764703267,
       "count": 5,
       "title": "Anthropic's Claude AI blocks video game cloning and reverse-engineering"
-    },
-    "fd09e24fb0b7": {
-      "firstSeen": 1793505502964,
-      "lastSeen": 1793678302675,
-      "count": 4,
-      "title": "Reading Anthropic's S-1 as a Claude Code user"
     },
     "64fc96289c09": {
       "firstSeen": 1793505502965,
@@ -540,12 +444,6 @@
       "count": 8,
       "title": "Anthropic Updates Claude To Stop It From Recreating Existing Video Games"
     },
-    "3afe493f7d9f": {
-      "firstSeen": 1793591907139,
-      "lastSeen": 1793678302676,
-      "count": 3,
-      "title": "DeepSeek launches autonomous coding agent to challenge Anthropic’s Claude Code"
-    },
     "f9d477109c22": {
       "firstSeen": 1793591907139,
       "lastSeen": 1793764703268,
@@ -558,59 +456,11 @@
       "count": 2,
       "title": "Want to invest in Anthropic before its IPO? These 5 funds offer exposure to the AI giant."
     },
-    "4228d709d494": {
-      "firstSeen": 1793591907139,
-      "lastSeen": 1793678302676,
-      "count": 3,
-      "title": "Anthropic’s Claude AI Predicts a Seismic BNB Move Post-Binance Hack"
-    },
-    "7686d0efab7e": {
-      "firstSeen": 1793591907139,
-      "lastSeen": 1793678302676,
-      "count": 3,
-      "title": "“Steer it away”: Anthropic tells Claude Code not to recreate someone else’s game"
-    },
-    "4f82e01bd08c": {
-      "firstSeen": 1793591907139,
-      "lastSeen": 1793678302676,
-      "count": 3,
-      "title": "Anthropic Terms Ban Training Rivals; User Says Claude Blocks"
-    },
-    "8b6a69d6c0f3": {
-      "firstSeen": 1793591907139,
-      "lastSeen": 1793678302676,
-      "count": 3,
-      "title": "Weeks Ahead Of Expected Anthropic IPO, DeepSeek Launches Autonomous Coding Agent To Take On Claude C"
-    },
     "27fd337c1d2c": {
       "firstSeen": 1793591907139,
       "lastSeen": 1793764703268,
       "count": 4,
       "title": "Anthropic hiring manager says he stopped giving coding interviews because Claude is better at them —"
-    },
-    "5c38b2dce290": {
-      "firstSeen": 1793591907139,
-      "lastSeen": 1793678302676,
-      "count": 3,
-      "title": "Anthropic to Watermark 4 Older Claude Models for EU AI Act"
-    },
-    "55ef761f148d": {
-      "firstSeen": 1793591907139,
-      "lastSeen": 1793678302675,
-      "count": 3,
-      "title": "Anthropic removes Claude Code’s five-hour usage cap for Ultra subscribers"
-    },
-    "6e0ff283f976": {
-      "firstSeen": 1793591907139,
-      "lastSeen": 1793678302676,
-      "count": 3,
-      "title": "“Looks harmless”: Claude agents got past a safety check in an Anthropic test"
-    },
-    "ab7a6f68a11c": {
-      "firstSeen": 1793591907139,
-      "lastSeen": 1793678302676,
-      "count": 3,
-      "title": "Anthropic restricts Claude's use for reverse-engineering games, including through REA tool"
     },
     "06fe8d0bf364": {
       "firstSeen": 1793637681861,
@@ -684,18 +534,6 @@
       "count": 8,
       "title": "Anthropic reveals $900bn AI spending commitments ahead of IPO"
     },
-    "51f5c29a0641": {
-      "firstSeen": 1793637681862,
-      "lastSeen": 1793678302676,
-      "count": 2,
-      "title": "Anthropic is going after the rise of vibe-coded game ports with new Claude Code restrictions"
-    },
-    "1e570a932589": {
-      "firstSeen": 1793637681862,
-      "lastSeen": 1793678302676,
-      "count": 2,
-      "title": "Anthropic Internal Analysis: AI Led 26% of Next-Generation Claude Development"
-    },
     "cccd5af1450f": {
       "firstSeen": 1793637681862,
       "lastSeen": 1793851102398,
@@ -708,29 +546,11 @@
       "count": 4,
       "title": "Anthropic Says Claude Devised Data To Evade Safety Checks"
     },
-    "97bbbd7a05f7": {
-      "firstSeen": 1793637681862,
-      "lastSeen": 1793678302676,
-      "count": 2,
-      "title": "Anthropic Steers Claude Code Away From Cloning Video Games"
-    },
-    "9a5230361af5": {
-      "firstSeen": 1793637681862,
-      "lastSeen": 1793678302676,
-      "count": 2,
-      "title": "Anthropic’s Claude can now secretly flag harmful chats for review: How its new AI safety feature wor"
-    },
     "0d46cc36d4f5": {
       "firstSeen": 1793637681862,
       "lastSeen": 1793851102398,
       "count": 4,
       "title": "Claude maker Anthropic reports $17 billion revenue ahead of Nasdaq listing"
-    },
-    "5af31ab2b356": {
-      "firstSeen": 1793637681862,
-      "lastSeen": 1793678302676,
-      "count": 2,
-      "title": "OpenCode brings Claude subscriptions back, ten months after Anthropic shut third-party harnesses out"
     },
     "034ddf46d325": {
       "firstSeen": 1793637681863,
@@ -738,35 +558,11 @@
       "count": 3,
       "title": "Anthropic cracks down on video game cloning with new Claude restrictions"
     },
-    "9289f3f75b14": {
-      "firstSeen": 1793637681863,
-      "lastSeen": 1793678302676,
-      "count": 2,
-      "title": "As IPO nears, Claude-maker Anthropic is set to make hundreds of employees millionaires; and it is wo"
-    },
     "97b75e6b904f": {
       "firstSeen": 1793637681863,
       "lastSeen": 1793851102398,
       "count": 3,
       "title": "Anthropic Restricts AI Bot Claude's Ability to Clone or Decompile 'Specific Existing Games'"
-    },
-    "2e76cc3bb669": {
-      "firstSeen": 1793637681863,
-      "lastSeen": 1793678302676,
-      "count": 2,
-      "title": "Anthropic Adds a Rule to Stop Claude From Making AI Copies of Your Favourite Games"
-    },
-    "fccd754ed8da": {
-      "firstSeen": 1793637681863,
-      "lastSeen": 1793678302676,
-      "count": 2,
-      "title": "Why Anthropic wants users to stop abusing Claude. It’s about AI safety, not feelings"
-    },
-    "65c00d158775": {
-      "firstSeen": 1793637681863,
-      "lastSeen": 1793678302676,
-      "count": 2,
-      "title": "GPT-6.2 Astra开启灰测！Claude Mythos 5.5同日曝光"
     },
     "81f82642f994": {
       "firstSeen": 1793678302674,
@@ -797,12 +593,6 @@
       "lastSeen": 1793851102397,
       "count": 3,
       "title": "Anthropic Clamps Down On AI Game Clones In Strict Claude Update And Devs React"
-    },
-    "a33b6626e4b8": {
-      "firstSeen": 1793678302675,
-      "lastSeen": 1793678302675,
-      "count": 1,
-      "title": "Anthropic’s business plan: Build God or die trying"
     },
     "bc0766f3600d": {
       "firstSeen": 1793678302675,
@@ -876,18 +666,6 @@
       "count": 8,
       "title": "Anthropic Buys One-Person Biotech to Prove Claude Can Make Drugs"
     },
-    "d3c3a2541522": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic implements a regulation to prevent Claude Code from replicating existing games"
-    },
-    "9e90d707005f": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic's new S-1 SEC filing discloses $895.4 billion in committed spending on AI expenditures"
-    },
     "f64b8860ff39": {
       "firstSeen": 1793678302676,
       "lastSeen": 1793851102398,
@@ -912,18 +690,6 @@
       "count": 3,
       "title": "Anthropic’s internal use of Claude topped staff costs at list prices by April"
     },
-    "6706b7c1f042": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic manager stops coding interviews due to Claude AI's capabilities"
-    },
-    "157861fda05d": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic Drops Q3 Financials in Amended IPO Filing"
-    },
     "3813c4eece5c": {
       "firstSeen": 1793678302676,
       "lastSeen": 1793764703269,
@@ -942,53 +708,17 @@
       "count": 2,
       "title": "SentinelOne Expands AI Security to Anthropic's Claude Cowork"
     },
-    "c8c013d28bd7": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic restricts Claude Code from recreating existing games, developers report blocked projects"
-    },
     "a947bd69aace": {
       "firstSeen": 1793678302676,
       "lastSeen": 1793764703269,
       "count": 2,
       "title": "Anthropic Expands Claude Into Drug Development"
     },
-    "f46c4db1e0a6": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic warns it is nearing Self-Building AI, what it means for the future"
-    },
     "9580ef343f34": {
       "firstSeen": 1793678302676,
       "lastSeen": 1794196703402,
       "count": 2,
       "title": "Anthropic restricts Claude AI from cloning video games and reverse-engineering"
-    },
-    "c1994fbf1cf3": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Claude AI Floats $5,000 Bitcoin Cash Scenario, but the Chart Says Otherwise"
-    },
-    "31a7c3e715ca": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic stops Claude Code from cloning games, and ends up blocking real devs"
-    },
-    "7e5e18fca74c": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic Prospectus Issues Rare Warning: AI Self-Improvement Threshold \"May Be Imminent\""
-    },
-    "05ed399b6c0f": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic’s new IPO filing puts its computing bill near $900 billion"
     },
     "f868ee5af217": {
       "firstSeen": 1793678302676,
@@ -1050,35 +780,11 @@
       "count": 3,
       "title": "Anthropic Rumored to Test Claude Fable/Mythos 5.5 Ahead of IPO, OpenAI A/B-Tests GPT-6.2 Astra"
     },
-    "7a95c3541f1a": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic Is Betting Nearly $900 Billion That the AI Boom Won’t Bust"
-    },
-    "b3c10be8ba56": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "Anthropic is stopping Claude from copying existing video games: Here’s why"
-    },
-    "b550ae016bb7": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "New York Times and other outlets sue web browser Brave over alleged content scraping"
-    },
     "1550268efc45": {
       "firstSeen": 1793678302676,
       "lastSeen": 1794243551847,
       "count": 8,
       "title": "Claude’s new rules against game cloning won’t stop the AI copying boom"
-    },
-    "160ccfccc00c": {
-      "firstSeen": 1793678302676,
-      "lastSeen": 1793678302676,
-      "count": 1,
-      "title": "8点1氪丨iPhone Duo中国版被指偷工减料，苹果回应；罗技广告再被指用“狗”侮辱用户；Anthropic第三季度营收暴增1127%"
     },
     "565f797df002": {
       "firstSeen": 1793764703267,
@@ -1412,14 +1118,14 @@
     },
     "c7766911f1fc": {
       "firstSeen": 1793851102398,
-      "lastSeen": 1794887904963,
-      "count": 10,
+      "lastSeen": 1794933299539,
+      "count": 11,
       "title": "Anthropic in London: AI and Science"
     },
     "7dfff968ffbd": {
       "firstSeen": 1793851102398,
-      "lastSeen": 1794887904964,
-      "count": 7,
+      "lastSeen": 1794933299539,
+      "count": 8,
       "title": "Iran, Russia, China Misused Claude AI: Anthropic Report"
     },
     "3ced3d4b872c": {
@@ -1820,8 +1526,8 @@
     },
     "0d82ac447850": {
       "firstSeen": 1794023903385,
-      "lastSeen": 1794887904963,
-      "count": 13,
+      "lastSeen": 1794933299538,
+      "count": 14,
       "title": "[asgeirtj/system_prompts_leaks] Leaked system prompts of ChatGPT, Claude, Gemini and more. The hidde"
     },
     "59a22ab1429e": {
@@ -2486,8 +2192,8 @@
     },
     "39faa8177c8a": {
       "firstSeen": 1794243551848,
-      "lastSeen": 1794887904964,
-      "count": 3,
+      "lastSeen": 1794933299539,
+      "count": 4,
       "title": "Anthropic opens Singapore office and signs MOU with the Government of Singapore"
     },
     "7043fd97cef6": {
@@ -2828,8 +2534,8 @@
     },
     "eeef2d4864c9": {
       "firstSeen": 1794283103387,
-      "lastSeen": 1794801504310,
-      "count": 7,
+      "lastSeen": 1794933299539,
+      "count": 8,
       "title": "Anthropic announces Claude Fable 5.2 and Mythos 5.2. They'e already solved black hole physics proble"
     },
     "9025315597f6": {
@@ -2990,8 +2696,8 @@
     },
     "6e9438785581": {
       "firstSeen": 1794369503615,
-      "lastSeen": 1794887904963,
-      "count": 8,
+      "lastSeen": 1794933299538,
+      "count": 9,
       "title": "Anthropic Launches Claude Meetings"
     },
     "e5e87248cd3f": {
@@ -3008,20 +2714,20 @@
     },
     "9c1c817a8d69": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794887904963,
-      "count": 8,
+      "lastSeen": 1794933299538,
+      "count": 9,
       "title": "Roadshow Launch"
     },
     "7b51d7a04d79": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794887904964,
-      "count": 7,
+      "lastSeen": 1794933299538,
+      "count": 8,
       "title": "Claude chatbot maker set for $1.3tn stock market debut despite 'catastrophic' AI warning"
     },
     "bc4994f1cb0d": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794887904963,
-      "count": 7,
+      "lastSeen": 1794933299538,
+      "count": 8,
       "title": "Anthropic launches Claude Meetings to turn workplace discussions into plans and tasks"
     },
     "fa64f8e46999": {
@@ -3032,26 +2738,26 @@
     },
     "d0d80edfba00": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794801504310,
-      "count": 6,
+      "lastSeen": 1794933299538,
+      "count": 7,
       "title": "Anthropic Takes On Google And Microsoft With Claude Sheets"
     },
     "ee045160689d": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794887904963,
-      "count": 7,
+      "lastSeen": 1794933299538,
+      "count": 8,
       "title": "Anthropic wants Claude to join your meetings"
     },
     "94eb5428c8ef": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794801504310,
-      "count": 6,
+      "lastSeen": 1794933299538,
+      "count": 7,
       "title": "Anthropic brings Claude to Google Meet to tackle tasks live"
     },
     "757812bc5842": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794628705920,
-      "count": 4,
+      "lastSeen": 1794933299538,
+      "count": 5,
       "title": "Anthropic launches Meetings, Whiteboards, Sheets, Data ahead of IPO"
     },
     "5f997f41f041": {
@@ -3062,14 +2768,14 @@
     },
     "ac9b78a50ceb": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794801504310,
-      "count": 6,
+      "lastSeen": 1794933299538,
+      "count": 7,
       "title": "Anthropic Bankers Look to Increase IPO Valuation, Report Says"
     },
     "e172682e59ae": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794887904963,
-      "count": 7,
+      "lastSeen": 1794933299538,
+      "count": 8,
       "title": "Anthropic has its own AI-powered office suite now"
     },
     "2c880f1d8458": {
@@ -3080,8 +2786,8 @@
     },
     "175fa0baceac": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794887904963,
-      "count": 7,
+      "lastSeen": 1794933299538,
+      "count": 8,
       "title": "Anthropic launches new suits of AI office productivity tools in run up to IPO"
     },
     "78f9c8b70bbe": {
@@ -3092,8 +2798,8 @@
     },
     "f2facc824419": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794715104055,
-      "count": 5,
+      "lastSeen": 1794933299538,
+      "count": 6,
       "title": "Anthropic Goes for Microsoft’s Crown With New Claude-Powered Office Tools"
     },
     "03a0bb9866ba": {
@@ -3158,8 +2864,8 @@
     },
     "e62a3c28fb12": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794887904963,
-      "count": 6,
+      "lastSeen": 1794933299539,
+      "count": 7,
       "title": "Anthropic Agrees to Protections for Teachers Who Use Claude"
     },
     "5aa98f2c1083": {
@@ -3170,8 +2876,8 @@
     },
     "10fefdc2f4f5": {
       "firstSeen": 1794369503616,
-      "lastSeen": 1794801504310,
-      "count": 6,
+      "lastSeen": 1794933299538,
+      "count": 7,
       "title": "Anthropic’s Claude Can Now Join Your Meetings. Its Most Useful Function Happens Before the Call Ends"
     },
     "eb8ece4ca7e0": {
@@ -3308,8 +3014,8 @@
     },
     "81a3a0cbc948": {
       "firstSeen": 1794369503617,
-      "lastSeen": 1794801504309,
-      "count": 6,
+      "lastSeen": 1794933299539,
+      "count": 7,
       "title": "Anthropic just launched its most powerful Claude ahead of its IPO — here's why it's telling users to"
     },
     "3eaf30c634e7": {
@@ -3368,8 +3074,8 @@
     },
     "64f448cd7057": {
       "firstSeen": 1794369503617,
-      "lastSeen": 1794887904963,
-      "count": 7,
+      "lastSeen": 1794933299539,
+      "count": 8,
       "title": "What we know about Anthropic's new Claude AI models"
     },
     "2cdde88f8cbb": {
@@ -3506,32 +3212,32 @@
     },
     "0ab4d5df0740": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794887904963,
-      "count": 7,
+      "lastSeen": 1794933299538,
+      "count": 8,
       "title": "Ask HN: What models do you use for tasks Anthropic/OpenAI don't approve of?"
     },
     "da20c880b600": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794887904963,
-      "count": 7,
+      "lastSeen": 1794933299538,
+      "count": 8,
       "title": "Anthropic donates 3000 ultra licenses to CNCF maintainers"
     },
     "b47a98a5480e": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794887904963,
-      "count": 7,
+      "lastSeen": 1794933299538,
+      "count": 8,
       "title": "Anthropic Unveils Claude Whiteboards, Claude Sheets, and Claude Data"
     },
     "688335f6a0b0": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794801504310,
-      "count": 5,
+      "lastSeen": 1794933299538,
+      "count": 6,
       "title": "Claude Traffic Surges 24% In October As Anthropic IPO Looms—Beating AI Rivals"
     },
     "7d5c4a39f955": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794801504310,
-      "count": 5,
+      "lastSeen": 1794933299538,
+      "count": 6,
       "title": "Anthropic's new Claude product drop just sent a message to these 3 tech stocks"
     },
     "8e5256502e4a": {
@@ -3554,8 +3260,8 @@
     },
     "08f3ac99d912": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794887904963,
-      "count": 4,
+      "lastSeen": 1794933299539,
+      "count": 5,
       "title": "Claude Meetings Brings Anthropic’s AI Into Google Meet Calls"
     },
     "daf511d8608e": {
@@ -3572,8 +3278,8 @@
     },
     "0883f0b56448": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794801504310,
-      "count": 5,
+      "lastSeen": 1794933299539,
+      "count": 6,
       "title": "Anthropic targets workplace collaboration with Claude Meetings"
     },
     "9e0edfaad64c": {
@@ -3584,8 +3290,8 @@
     },
     "928251cabb85": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794887904964,
-      "count": 6,
+      "lastSeen": 1794933299539,
+      "count": 7,
       "title": "Is Claude Bearish On Its Own Stock? Claude AI Predicts a Woeful Anthropic IPO"
     },
     "1530040e1a2a": {
@@ -3596,14 +3302,14 @@
     },
     "35b770ee7966": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794542303277,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "Clarivate Expands IPOne Platform with Patent and Litigation Data Connectors for Anthropic’s Claude A"
     },
     "eea19e0a2e66": {
       "firstSeen": 1794455909989,
-      "lastSeen": 1794887904963,
-      "count": 6,
+      "lastSeen": 1794933299539,
+      "count": 7,
       "title": "What Anthropic Claude Meetings Means for Enterprises"
     },
     "6c6865a7d470": {
@@ -3620,8 +3326,8 @@
     },
     "9d2322f340ab": {
       "firstSeen": 1794455909990,
-      "lastSeen": 1794628705920,
-      "count": 3,
+      "lastSeen": 1794933299539,
+      "count": 4,
       "title": "Anthropic's Claude Fable 5.2 Scores Below Fable 5.1 on Accounting Work, DualEntry Benchmark Finds"
     },
     "0f66e449879d": {
@@ -3758,20 +3464,20 @@
     },
     "7f4aaec867be": {
       "firstSeen": 1794542303276,
-      "lastSeen": 1794887904963,
-      "count": 6,
+      "lastSeen": 1794933299538,
+      "count": 7,
       "title": "Anthropic carelessly killed a Claude Code feature users built on, no warning"
     },
     "4bd5bf9a38df": {
       "firstSeen": 1794542303276,
-      "lastSeen": 1794887904963,
-      "count": 6,
+      "lastSeen": 1794933299538,
+      "count": 7,
       "title": "Claude Code's API billing depends on how often the cache expires"
     },
     "f5cbc46b1579": {
       "firstSeen": 1794542303276,
-      "lastSeen": 1794887904963,
-      "count": 6,
+      "lastSeen": 1794933299538,
+      "count": 7,
       "title": "[anthropics/claude-plugins-official] Official, Anthropic-managed directory of high quality Claude Co"
     },
     "943f30c876f1": {
@@ -3782,8 +3488,8 @@
     },
     "c0b45e41afeb": {
       "firstSeen": 1794542303276,
-      "lastSeen": 1794801504310,
-      "count": 4,
+      "lastSeen": 1794933299538,
+      "count": 5,
       "title": "With IPO looming, Anthropic launches Claude product for manufacturers"
     },
     "8ee20f5790b1": {
@@ -3794,14 +3500,14 @@
     },
     "11848b6e5ab8": {
       "firstSeen": 1794542303276,
-      "lastSeen": 1794801504309,
-      "count": 4,
+      "lastSeen": 1794933299538,
+      "count": 5,
       "title": "Anthropic IPO: Claude maker to begin trading on Thursday, Nov. 19"
     },
     "137537674ad6": {
       "firstSeen": 1794542303276,
-      "lastSeen": 1794887904963,
-      "count": 6,
+      "lastSeen": 1794933299538,
+      "count": 7,
       "title": "Anthropic launches ‘Claude for Manufacturing’"
     },
     "d88b9bcea071": {
@@ -3812,14 +3518,14 @@
     },
     "4fb47fcba090": {
       "firstSeen": 1794542303276,
-      "lastSeen": 1794887904963,
-      "count": 5,
+      "lastSeen": 1794933299539,
+      "count": 6,
       "title": "Anthropic's Claude AI Blocks Pokémon Fan Games Over Copyright Concerns—What Changed?"
     },
     "25ea83614423": {
       "firstSeen": 1794542303276,
-      "lastSeen": 1794801504309,
-      "count": 4,
+      "lastSeen": 1794933299539,
+      "count": 5,
       "title": "Anthropic’s Claude Tops AI Rankings as OpenAI Limits Cyber Model"
     },
     "079db073db09": {
@@ -3830,8 +3536,8 @@
     },
     "b72173c0f19d": {
       "firstSeen": 1794542303276,
-      "lastSeen": 1794542303276,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic expands Claude AI suite with Sheets, Whiteboards, live data tools"
     },
     "fb5058529073": {
@@ -3842,8 +3548,8 @@
     },
     "97d89d7c7b88": {
       "firstSeen": 1794542303277,
-      "lastSeen": 1794887904963,
-      "count": 5,
+      "lastSeen": 1794933299539,
+      "count": 6,
       "title": "Anthropic Launches Claude Meetings Beta for Live Video Calls"
     },
     "a21acdac2191": {
@@ -3956,8 +3662,8 @@
     },
     "6365ac5d85f3": {
       "firstSeen": 1794542303277,
-      "lastSeen": 1794801504310,
-      "count": 4,
+      "lastSeen": 1794933299539,
+      "count": 5,
       "title": "Can anything derail Anthropic’s IPO?"
     },
     "1f99a4959471": {
@@ -3992,8 +3698,8 @@
     },
     "bd293700f8b1": {
       "firstSeen": 1794542303277,
-      "lastSeen": 1794715104055,
-      "count": 3,
+      "lastSeen": 1794933299539,
+      "count": 4,
       "title": "Anthropic’s Claude Fable 5.2 built a shooter in 1 prompt — and it only took 8 hours and $550"
     },
     "68effdbc2762": {
@@ -4034,8 +3740,8 @@
     },
     "010253ddd3e6": {
       "firstSeen": 1794628705920,
-      "lastSeen": 1794887904963,
-      "count": 4,
+      "lastSeen": 1794933299538,
+      "count": 5,
       "title": "Anthropic Claude down: Why it said it was unable to authenticate code"
     },
     "d183c6ba5005": {
@@ -4046,8 +3752,8 @@
     },
     "51a34f765514": {
       "firstSeen": 1794628705920,
-      "lastSeen": 1794801504310,
-      "count": 3,
+      "lastSeen": 1794933299539,
+      "count": 4,
       "title": "Anthropic challenges Microsoft with new Claude office tools"
     },
     "1968fe3972a5": {
@@ -4148,8 +3854,8 @@
     },
     "b1cb34a43a6b": {
       "firstSeen": 1794628705920,
-      "lastSeen": 1794887904963,
-      "count": 4,
+      "lastSeen": 1794933299539,
+      "count": 5,
       "title": "Anthropic's AI 'Claude' Joins Meetings, Aiming to Create Documents Alongside Minutes"
     },
     "38cbc24b6e82": {
@@ -4166,26 +3872,26 @@
     },
     "ecfecb16cf52": {
       "firstSeen": 1794628705920,
-      "lastSeen": 1794887904963,
-      "count": 4,
+      "lastSeen": 1794933299539,
+      "count": 5,
       "title": "Anthropic's Claude Hit by Widespread Login Failures Across Chat, Code and Console"
     },
     "1a9a6451ae52": {
       "firstSeen": 1794628705921,
-      "lastSeen": 1794887904963,
-      "count": 4,
+      "lastSeen": 1794933299539,
+      "count": 5,
       "title": "Anthropic’s Claude is experiencing a widespread outage, causing elevated errors (Update: Back up)"
     },
     "3c960815f99b": {
       "firstSeen": 1794628705921,
-      "lastSeen": 1794887904964,
-      "count": 4,
+      "lastSeen": 1794933299539,
+      "count": 5,
       "title": "Infor and Anthropic bring Claude AI to manufacturing operations"
     },
     "698dad439352": {
       "firstSeen": 1794628705921,
-      "lastSeen": 1794887904963,
-      "count": 4,
+      "lastSeen": 1794933299539,
+      "count": 5,
       "title": "Claude’s Duet agent is a little neurotic and surprisingly helpful"
     },
     "6de02610ac0d": {
@@ -4232,8 +3938,8 @@
     },
     "058826928a26": {
       "firstSeen": 1794628705921,
-      "lastSeen": 1794628705921,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Cognizant commits 25,000 professionals to Anthropic’s Claude AI enterprise push"
     },
     "d130a6bf43f7": {
@@ -4250,38 +3956,38 @@
     },
     "63812411a183": {
       "firstSeen": 1794715104054,
-      "lastSeen": 1794887904963,
-      "count": 4,
+      "lastSeen": 1794933299538,
+      "count": 5,
       "title": "Anthropic: Mythos got Claude running on AMD chips in 3 days instead of months"
     },
     "96154167db0e": {
       "firstSeen": 1794715104054,
-      "lastSeen": 1794887904963,
-      "count": 4,
+      "lastSeen": 1794933299538,
+      "count": 5,
       "title": "Anthropic upgrades Claude Code Projects to run parallel AI workers"
     },
     "f042b51419e6": {
       "firstSeen": 1794715104054,
-      "lastSeen": 1794887904963,
-      "count": 3,
+      "lastSeen": 1794933299538,
+      "count": 4,
       "title": "Anthropic says outdated prompting habits are slowing down Claude Opus 5.5"
     },
     "1ecaf355e4e7": {
       "firstSeen": 1794715104054,
-      "lastSeen": 1794887904963,
-      "count": 3,
+      "lastSeen": 1794933299538,
+      "count": 4,
       "title": "Building strong safety evaluations"
     },
     "f165eea079b3": {
       "firstSeen": 1794715104055,
-      "lastSeen": 1794801504309,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "Anthropic wants you to build on Claude. There’s a catch."
     },
     "69f4d662c4e9": {
       "firstSeen": 1794715104055,
-      "lastSeen": 1794801504310,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "KPMG Launches Cybersecurity Services Powered by Anthropic’s Claude Mythos"
     },
     "375ab6336bb4": {
@@ -4310,8 +4016,8 @@
     },
     "71a4edda4a64": {
       "firstSeen": 1794715104055,
-      "lastSeen": 1794887904963,
-      "count": 3,
+      "lastSeen": 1794933299539,
+      "count": 4,
       "title": "Microsoft outage disrupts Claude AI for thousands"
     },
     "a9350835d1b0": {
@@ -4340,14 +4046,14 @@
     },
     "67c4f928fe12": {
       "firstSeen": 1794715104055,
-      "lastSeen": 1794887904964,
-      "count": 3,
+      "lastSeen": 1794933299539,
+      "count": 4,
       "title": "Claude maker Anthropic’s US$64b stock market gamble tests Wall Street’s faith in AI boom"
     },
     "11c3364456e5": {
       "firstSeen": 1794715104055,
-      "lastSeen": 1794887904964,
-      "count": 3,
+      "lastSeen": 1794933299539,
+      "count": 4,
       "title": "Is Claude AI Down? Anthropic Confirms Authentication Issues Across Multiple Services"
     },
     "475486efb0b2": {
@@ -4376,14 +4082,14 @@
     },
     "643b3d1760f4": {
       "firstSeen": 1794715104056,
-      "lastSeen": 1794801504310,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "Claude outage: Anthropic confirms authentication issues affecting Claude.ai, Claude Code and Console"
     },
     "05eeabf77e12": {
       "firstSeen": 1794801504309,
-      "lastSeen": 1794887904963,
-      "count": 2,
+      "lastSeen": 1794933299538,
+      "count": 3,
       "title": "Meet the miso-making engineer behind Anthropic’s biggest hit"
     },
     "b0bd8efe031e": {
@@ -4412,8 +4118,8 @@
     },
     "b2549e837652": {
       "firstSeen": 1794801504310,
-      "lastSeen": 1794887904963,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "Anthropic's Claude Fable 5.2 doesn't generate images, it paints them"
     },
     "8d5aa85549ae": {
@@ -4424,8 +4130,8 @@
     },
     "8fca6317aca0": {
       "firstSeen": 1794801504310,
-      "lastSeen": 1794887904964,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "Anthropic heads to market with billions riding on AI's promise"
     },
     "9c6784fac9a5": {
@@ -4436,8 +4142,8 @@
     },
     "2b3b8390200a": {
       "firstSeen": 1794801504310,
-      "lastSeen": 1794887904964,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "Claude AI hit by outage as users report login and access problems"
     },
     "372c7876569b": {
@@ -4454,14 +4160,14 @@
     },
     "c89d046decb7": {
       "firstSeen": 1794801504310,
-      "lastSeen": 1794887904964,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "Claude down, login problems on claude.ai and Claude Code"
     },
     "b8ed82fac5ed": {
       "firstSeen": 1794801504310,
-      "lastSeen": 1794887904964,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "What an Anthropic index says about Japan's AI challenges"
     },
     "f12faf440397": {
@@ -4502,8 +4208,8 @@
     },
     "c95fe1fc9195": {
       "firstSeen": 1794801504310,
-      "lastSeen": 1794887904964,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "Five things to know about Anthropic as AI giant targets record-breaking stock debut"
     },
     "e75417fda9ab": {
@@ -4514,8 +4220,8 @@
     },
     "c6bd64eb51e1": {
       "firstSeen": 1794801504310,
-      "lastSeen": 1794887904964,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "From Carnegie to Claude: AI wealth could reshape philanthropy"
     },
     "3ef7789761ae": {
@@ -4550,8 +4256,8 @@
     },
     "1aa9b07f10c4": {
       "firstSeen": 1794801504310,
-      "lastSeen": 1794887904964,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "How Claude Fable 5.2 paints pictures by writing code for a simulated brush instead of generating pix"
     },
     "a339aca20d1d": {
@@ -4580,8 +4286,8 @@
     },
     "4cd17a7d4762": {
       "firstSeen": 1794801504310,
-      "lastSeen": 1794887904963,
-      "count": 2,
+      "lastSeen": 1794933299539,
+      "count": 3,
       "title": "Cursor Says Stolen Fireworks AI Key Led to Trojanized Claude Code Extension Incident"
     },
     "0d2b397f7d26": {
@@ -4622,140 +4328,140 @@
     },
     "a02a5756fb8d": {
       "firstSeen": 1794887904963,
-      "lastSeen": 1794887904963,
-      "count": 1,
+      "lastSeen": 1794933299538,
+      "count": 2,
       "title": "Anthropic IPO guide: Everything you need to know"
     },
     "9a5b8b12c284": {
       "firstSeen": 1794887904963,
-      "lastSeen": 1794887904963,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic recognises the risks to humanity – but is its governance really up to the job? | Nils Prat"
     },
     "da5895ccca67": {
       "firstSeen": 1794887904963,
-      "lastSeen": 1794887904963,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic Claude AI Predicts a Historic BTC Price Reversal"
     },
     "967e9803281b": {
       "firstSeen": 1794887904963,
-      "lastSeen": 1794887904963,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic’s Claude AI Predicts a Euphoric Move for Cardano (ADA)"
     },
     "eb562141cddc": {
       "firstSeen": 1794887904963,
-      "lastSeen": 1794887904963,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic IPO 2026: How International Investors Can Buy Shares of Claude AI Developer?"
     },
     "8ad0ec305aaf": {
       "firstSeen": 1794887904963,
-      "lastSeen": 1794887904963,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic’s Claude Fable 5.2 blocks fewer security tasks, while Mythos gets better at finding bugs"
     },
     "cc50b5981280": {
       "firstSeen": 1794887904963,
-      "lastSeen": 1794887904963,
-      "count": 1,
+      "lastSeen": 1794933299538,
+      "count": 2,
       "title": "Anthropic says Claude Mythos Preview cut AMD MI355X onboarding from up to 12 months to around three "
     },
     "d1d8a7a17d0f": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic Consolidates a Range of Productivity Tools and Functions Inside Claude"
     },
     "c94f8ed80233": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic IPO tests AI safety promises as profits loom"
     },
     "18d63b37ae42": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic Launches Claude Sheets. Is Microsoft's Stock in Trouble?"
     },
     "2d3a75f5710c": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "BlackLine Now Available on Anthropic’s Claude Marketplace"
     },
     "596172c5b9b8": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic launches Claude Sheets, taking aim at Microsoft’s spreadsheet turf"
     },
     "3c06c8882d31": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic says the key to agent memory is knowing what to forget, not how much to store"
     },
     "b6a0e7cdaf47": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic updates Claude models with enhanced cybersecurity capabilities"
     },
     "b1a7149449e0": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic IPO Nears: Claude Maker to Debut on Nasdaq Nov. 19, Key Watchpoints for ANT Listing"
     },
     "cdcf0b7abb3b": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic's AI Beats Pokemon With \"Memory Tidy-Up\" — Self-Correction After Falling Off a Ledge Three"
     },
     "176f34cf3eb3": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Virtana Brings Agentic Observability to Microsoft Teams, Salesforce Slack and Anthropic Claude"
     },
     "b3b58a8e02f3": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic Says Claude Cut AMD GPU Migration From 1 Year to 3 Days, Rattling Nvidia's CUDA Moat"
     },
     "2db314e235f7": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic Adds Whiteboard, Spreadsheet and Data Features to Claude, Taking Aim at the Office Product"
     },
     "abd7b24fd920": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "An ‘unprecedented test of gullibility’: Why Anthropic’s US$1 trillion IPO is rattling Wall Street"
     },
     "d0750371b74b": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Tribe AI Named a Preferred Partner in Anthropic’s Claude Partner Network"
     },
     "97f7aa250139": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Anthropic IPO Nears: Claude Maker to Debut on Nasdaq Nov. 19"
     },
     "45b8eb34b4c7": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "BlackLine Announces Availability of Verity AI and Products on Anthropic’s Claude Marketplace"
     },
     "b668f6a314c9": {
@@ -4790,8 +4496,8 @@
     },
     "57c6bfa70841": {
       "firstSeen": 1794887904964,
-      "lastSeen": 1794887904964,
-      "count": 1,
+      "lastSeen": 1794933299539,
+      "count": 2,
       "title": "Google DeepMind Strategy Chief Jasjeet Sekhon Departs for Anthropic"
     },
     "e4b5249982b3": {
@@ -4883,7 +4589,331 @@
       "lastSeen": 1794887904964,
       "count": 1,
       "title": "Anthropic最快将于12月11日纳入罗素1000指数"
+    },
+    "2e80a6298aea": {
+      "firstSeen": 1794933299538,
+      "lastSeen": 1794933299538,
+      "count": 1,
+      "title": "Anthropic IPO: how can I buy shares, and is it worth it?"
+    },
+    "fa9e9a4f532e": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "What to Know Ahead of Anthropic’s IPO This Week (NASDAQ: ANT)"
+    },
+    "fbbc5fe045d2": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic's Dario Amodei is 'just setting himself up' with IPO, veteran tech investor warns"
+    },
+    "4fdc7517f14e": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "The Anthropic IPO Is Coming. I Wouldn't Buy on Day 1, I'd Do This Instead"
+    },
+    "76f04d1efa65": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Hedge Fund Coatue’s AI Bet Pays Off With $10 Billion Anthropic Stake"
+    },
+    "053b0df2a8f0": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic Said to Guide IPO Price to Top of Range or Above"
+    },
+    "32c67fd1c264": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic, Other AI Models Regularly Identify Civilians as Military Targets in Tests"
+    },
+    "252d822dbafa": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Who Is Anthropic Kidding?"
+    },
+    "9d75378d03b1": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Amazon, Google to Have About 28% of Anthropic Stock After IPO"
+    },
+    "bfacf3f095f3": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Stifel Working with Anthropic to Reimagine Its Dashboard Platform with Claude"
+    },
+    "0afa500bd6be": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "The SpaceX IPO Had Musk’s Star Power. Anthropic’s Has FOMO."
+    },
+    "70484254f5e0": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Infobip Expands Relationship With Anthropic With Verified Claude Connector for Global Messaging"
+    },
+    "f5a83283ddcf": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic IPO could make its employees worth an average of $41 million"
+    },
+    "cf38af14048f": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Sam Bankman-Fried’s former employer Jane Street could share in $35 billion windfall from FTX’s Anthr"
+    },
+    "20baeff6cb8b": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic’s Claude builds custom gadget blueprints, but consistency stays hidden"
+    },
+    "876e5fee3ed9": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic IPO opens retail access to AI at scale"
+    },
+    "de9ede126c89": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Claude Fable 5.2: Why Anthropic's Most Expensive Model Can End Up the Cheapest"
+    },
+    "74280083dcc2": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "With Anthropic IPO, Dario Amodei Becomes AI’s Leading Pitchman"
+    },
+    "de6057e32b44": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic's record IPO faces some big questions"
+    },
+    "4deb536af000": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic’s A.I. Got Claude Running on AMD Chips in Three Days"
+    },
+    "d628763587a2": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic IPO Puts SpaceX In Spotlight — Why Cathie Wood’s ARK Thinks The AI Lab Could Pay Musk ‘Obs"
+    },
+    "cb2e237f45cf": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Alibaba Takes on Anthropic With New Qwen AI Model"
+    },
+    "35cecfc034a6": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Alibaba challenges OpenAI and Anthropic with Qwen4-Max"
+    },
+    "bb3375422069": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Retail Traders Find New Ways To Bet on Anthropic"
+    },
+    "325a02a5be06": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "TSMC To Invest Up To $1B in Anthropic And OpenAI"
+    },
+    "035fa52ee9c2": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Key facts: Anthropic's $60B IPO; Q3 revenue $17B, Opus cuts costs 40%"
+    },
+    "2fda62598225": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Steve Eisman Says Anthropic IPO Is ‘Not Important Anymore,’ Points To Data Center Slowdown, Revenue "
+    },
+    "d6553cbbff9f": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic says Claude Mythos Preview got one model running on AMD MI355X GPUs in about three days"
+    },
+    "5ba6de671442": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "BlackLine products listed on Anthropic's Claude Marketplace"
+    },
+    "a2c8a173a6f1": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "OPM’s IT Office Funds Anthropic Software Order Through Carahsoft"
+    },
+    "333d26ad1d84": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic Cuts Disclosure Deadline to 30 Days For Serious Bugs"
+    },
+    "08924d4c4e40": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic's Quarterly Revenue Jumped 47% to $17 Billion Ahead of Its IPO"
+    },
+    "a67733eb1a15": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic Claude"
+    },
+    "ba96e793b13b": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "ANT: Anthropic Heads for IPO Pricing with Demand at Six Times Supply"
+    },
+    "061c33e8d756": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic's IPO Is 7x Oversubscribed, but Its Record Depends on $26 Billion From Its Own Suppliers"
+    },
+    "19ba0d846df2": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic Says Claude Leads 26% of Its Own AI R&D [2026]"
+    },
+    "d90fca98881c": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Infor teams up with Anthropic to integrate Claude AI into manufacturing operations"
+    },
+    "25b3e3be2a3a": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Did Anthropic Overnight Transform Microsoft's Landscape? Claude AI Enters Office Software Core: Inde"
+    },
+    "8e3eb4d7fae7": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "ETFs, Swaps, Perps Offer Back Door to Anthropic ‘Stock’ Pre-IPO"
+    },
+    "06e0ce2b9103": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "EDITORIAL | Monster IPO: Will Anthropic offering raise all AI boats?"
+    },
+    "854220cf4ae0": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic Said to Guide IPO Price to $78 or Higher"
+    },
+    "e7673706efac": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Op-Ed: Anthropic stock will test market faith in AI, maybe right down to the bone"
+    },
+    "9d6a90c5db0a": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic Challenges Nvidia’s AI Chip Dominance"
+    },
+    "83337a3aa463": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic Cuts Vulnerability Disclosure Window From 90 Days to 30 as AI-Accelerated Discovery Underm"
+    },
+    "19a703ad9003": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Plus500 Opens Anthropic CFD Pre-Orders Ahead of IPO"
+    },
+    "3a28129c8114": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "BlackLine Launches Availability on Anthropic’s Claude Marketplace"
+    },
+    "6eadd5a5eb7b": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic IPO: Claude’s Maker Heads for Thursday Debut"
+    },
+    "47c9a00f59e0": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic IPO 2026: Can Claude Maker Make History With One of the World's Biggest IPOs? Check Price,"
+    },
+    "0b31f8a19735": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic reveals Mythos got Claude running on AMD GPUs in 3 days"
+    },
+    "ec061e8f09e4": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Claude has less than a tenth of Copilot's weekly users inside Microsoft Office, Microsoft data shows"
+    },
+    "73050713500a": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Google DeepMind Chief Strategy Officer Jumps Ship to Anthropic as Talent Drain Accelerates"
+    },
+    "e2dde76d3900": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic最新招股文件：IPO发行价区间维持不变"
+    },
+    "bed884213293": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "Anthropic获准在纳斯达克全球精选市场上市A类普通股"
+    },
+    "2c729e924e7a": {
+      "firstSeen": 1794933299539,
+      "lastSeen": 1794933299539,
+      "count": 1,
+      "title": "“AI生成的代码必须开源！”开发者吵翻了，被开源代码喂大的Anthropic怕是第一个不同意"
     }
   },
-  "lastRun": "2026-11-17T03:58:30.305Z"
+  "lastRun": "2026-11-17T16:35:08.303Z"
 }
